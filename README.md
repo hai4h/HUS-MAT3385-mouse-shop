@@ -12,10 +12,10 @@
 ## Cấu trúc thư mục
 
 src/  
-├─ components/ # Các thành phần có thể tái sử dụng
-├─ pages/ # Các thành phần của trang  
-├─ hooks/ # Tùy chỉnh hooks
+├─ components/ # Các thành phần có thể tái sử dụng  
+├─ pages/ # Các thành phần của trang   
+├─ hooks/ # Tùy chỉnh hooks  
 ├─ services/ # API services  
-├─ utils/ # Helper functions 
-├─ assets/ # Static assets
+├─ utils/ # Helper functions  
+├─ assets/ # Static assets  
 └─ styles/ # Global styles  
