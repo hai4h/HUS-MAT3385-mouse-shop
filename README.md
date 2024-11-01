@@ -4,7 +4,7 @@
   - Chứa code mới nhất đã được test sơ bộ
   - Là branch để integrate code từ các feature branches
 
-# Quy trình làm việc với develop:
+# Quy trình làm việc với `develop`:
 ## 1. Trước khi tạo feature mới:
 ```
 git checkout develop
