@@ -1,7 +1,7 @@
 # Mouse Shop - Frontend User
 
 ## Tech Stack
-(tham khảo phía dưới)
+(tham khảo)
 - React 18
 - React Router 6
 - Axios
