@@ -3,6 +3,28 @@
   - Dành cho team phát triển giao diện admin
   - Chứa các components và pages cho admin dashboard
 
+# Frontend Admin Developer workflow:
+## 1. Tạo branch cho tính năng mới:
+```
+git checkout feature/frontend-admin
+git pull origin feature/frontend-admin
+git checkout -b feature/admin/dashboard-analytics
+```
+
+## 2. Sau khi code xong:
+```
+git add .
+git commit -m "feat: add dashboard analytics"
+git push origin feature/admin/dashboard-analytics
+```
+
+## 3. Tạo Pull Request vào feature/frontend-admin
+## 4. Sau khi review và merge:
+```
+git checkout feature/frontend-admin
+git pull origin feature/frontend-admin
+```
+
 # Tech Stack
 (tham khảo)
 - React 18
