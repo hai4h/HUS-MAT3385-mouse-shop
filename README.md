@@ -1,2 +1,21 @@
-# HUS-MAT3385-mouse-shop
-Dự án này được thực hiện bởi người học dành cho môn học Cơ sở dữ liệu Web và hệ thống thông tin tại trường Khoa học Tự nhiên, Đại học Quốc gia Hà Nội (VNU-HUS)
+# MouseX E-Commerce - BRANCH DEVELOP
+
+  - Branch phát triển chính
+  - Chứa code mới nhất đã được test sơ bộ
+  - Là branch để integrate code từ các feature branches
+
+# Quy trình làm việc với develop:
+## 1. Trước khi tạo feature mới:
+```
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-feature
+```
+
+## 2. Khi feature hoàn thành:
+```
+git checkout develop
+git pull origin develop
+git merge feature/your-feature
+git push origin develop
+```
