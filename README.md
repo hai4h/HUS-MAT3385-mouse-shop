@@ -1,6 +1,9 @@
 # Mouse Shop - Admin Dashboard
 
-## Tech Stack
+  - Dành cho team phát triển giao diện admin
+  - Chứa các components và pages cho admin dashboard
+
+# Tech Stack
 (tham khảo)
 - React 18
 - React Router 6
@@ -11,7 +14,7 @@
 - React Table
 - Chart.js
 
-## Cấu trúc thư mục
+# Cấu trúc thư mục
 
 src/  
 ├─ components/ # Các thành phần có thể tái sử dụng  
