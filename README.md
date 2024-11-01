@@ -1,7 +1,16 @@
 # HUS-MAT3385-mouse-shop
 Dự án này được thực hiện bởi người học dành cho môn học Cơ sở dữ liệu Web và hệ thống thông tin tại trường Khoa học Tự nhiên, Đại học Quốc gia Hà Nội (VNU-HUS)
 
-# Mouse Shop E-commerce
+# Lưu ý cho branch `main`
+
+- Đây là branch chính, chứa code production
+- Chỉ chứa code đã hoàn thiện, đã test kỹ và sẵn sàng để deploy
+- KHÔNG AI được push trực tiếp vào main
+- Code chỉ được merge vào main thông qua Pull Request từ branch develop
+- Mỗi version trên main cần được tag với version number
+
+
+# MouseX E-commerce
 
 Hệ thống website bán chuột gaming trực tuyến.
 
