@@ -29,6 +29,7 @@ Hệ thống website bán chuột gaming trực tuyến.
 - Database: MySQL
 - Containerization: Docker
 
+ERD: https://www.mermaidchart.com/raw/88237756-752b-4ff2-bed4-45dca42fa62e?theme=light&version=v0.1&format=svg
 
 ## Cấu trúc Project
 mouse-shop/
