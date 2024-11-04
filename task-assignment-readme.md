@@ -12,9 +12,9 @@
 | Công việc | Trạng thái |
 |-----------|------------|
 | Thiết kế giao diện trên Figma | 🔄 Đang thực hiện |
-| Thiết kế và hoàn thiện ERD | 🔄 Đang thực hiện |
-| Tạo GitHub repository và thiết lập branches | 🔄 Đang thực hiện |
-| Lập kế hoạch chi tiết và phân công công việc | 🔄 Đang thực hiện |
+| Thiết kế và hoàn thiện ERD | ✅ Hoàn thành |
+| Tạo GitHub repository và thiết lập branches | ✅ Hoàn thành |
+| Lập kế hoạch chi tiết và phân công công việc | ✅ Hoàn thành |
 
 ### 👨‍💻 Frontend Developer 1 (User Interface)
 | Công việc | Trạng thái |
