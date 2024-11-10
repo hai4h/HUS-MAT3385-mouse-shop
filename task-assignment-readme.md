@@ -11,7 +11,7 @@
 ### 👑 Trưởng nhóm
 | Công việc | Trạng thái |
 |-----------|------------|
-| Thiết kế giao diện trên Figma | 🔄 Đang thực hiện |
+| Thiết kế giao diện trên Figma | ✅ Hoàn thành |
 | Thiết kế và hoàn thiện ERD | ✅ Hoàn thành 3/11/2024 |
 | Tạo GitHub repository và thiết lập branches | ✅ Hoàn thành 3/11/2024 |
 | Lập kế hoạch chi tiết và phân công công việc | ✅ Hoàn thành 3/11/2024 |
@@ -19,22 +19,22 @@
 ### 👨‍💻 Frontend Developer 1 (User Interface)
 | Công việc | Trạng thái |
 |-----------|------------|
-| Nghiên cứu và setup project ReactJS | 🔄 Đang thực hiện |
-| Tạo cấu trúc component cơ bản | 🔄 Đang thực hiện |
-| Bắt đầu làm trang chủ và danh sách sản phẩm | 🔄 Đang thực hiện |
+| Nghiên cứu và setup project ReactJS | ✅ Hoàn thành |
+| Tạo cấu trúc component cơ bản | ✅ Hoàn thành |
+| Bắt đầu làm trang chủ và danh sách sản phẩm | ✅ Hoàn thành |
 
 ### 👨‍💻 Frontend Developer 2 (Admin Interface)
 | Công việc | Trạng thái |
 |-----------|------------|
-| Setup project ReactJS cho admin dashboard | 🔄 Đang thực hiện |
-| Tạo layout cơ bản cho admin panel | 🔄 Đang thực hiện |
-| Bắt đầu làm trang đăng nhập admin | 🔄 Đang thực hiện |
+| Setup project ReactJS cho admin dashboard | ✅ Hoàn thành |
+| Tạo layout cơ bản cho admin panel | ✅ Hoàn thành |
+| Bắt đầu làm trang đăng nhập admin | ✅ Hoàn thành |
 
 ### 👨‍💻 Backend Developer
 | Công việc | Trạng thái |
 |-----------|------------|
-| Thiết lập cơ sở dữ liệu MySQL theo ERD | 🔄 Đang thực hiện |
-| Setup project FastAPI | 🔄 Đang thực hiện |
-| Tạo các model cơ bản | 🔄 Đang thực hiện |
+| Thiết lập cơ sở dữ liệu MySQL theo ERD | ✅ Hoàn thành |
+| Setup project FastAPI | ✅ Hoàn thành |
+| Tạo các model cơ bản | ✅ Hoàn thành |
 
 
