@@ -37,4 +37,30 @@
 | Setup project FastAPI | ✅ Hoàn thành |
 | Tạo các model cơ bản | ✅ Hoàn thành |
 
+## TUẦN 2
+
+### 👑 Trưởng nhóm
+| Công việc | Trạng thái |
+|-----------|------------|
+| Kiểm tra tiến độ và code review | 🔄 Đang thực hiện |
+| Bắt đầu viết tài liệu hệ thống | 🔄 Đang thực hiện |
+
+### 👨‍💻 Frontend Developer 1 (User Interface)
+| Công việc | Trạng thái |
+|-----------|------------|
+| Làm trang sản phẩm | 🔄 Đang thực hiện |
+| Trang đăng nhập/đăng ký user | 🔄 Đang thực hiện |
+
+### 👨‍💻 Frontend Developer 2 (Admin Interface)
+| Công việc | Trạng thái |
+|-----------|------------|
+| Dashboard Overview | 🔄 Đang thực hiện |
+| Quản lý sản phẩm (CRUD) | 🔄 Đang thực hiện |
+
+### 👨‍💻 Backend Developer
+| Công việc | Trạng thái |
+|-----------|------------|
+| Xây dựng API authentication | 🔄 Đang thực hiện |
+| API quản lý sản phẩm | 🔄 Đang thực hiện |
+| API quản lý user | 🔄 Đang thực hiện |
 
