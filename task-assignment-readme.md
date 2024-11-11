@@ -6,7 +6,7 @@
 - ❌ Chưa hoàn thành
 - ⏸️ Tạm hoãn
 
-## TUẦN 1
+## TUẦN 1: 4/11/2024 - 10/11/2024
 
 ### 👑 Trưởng nhóm
 | Công việc | Trạng thái |
@@ -37,7 +37,7 @@
 | Setup project FastAPI | ✅ Hoàn thành |
 | Tạo các model cơ bản | ✅ Hoàn thành |
 
-## TUẦN 2
+## TUẦN 2: 11/11/2024 - 17/11/2024
 
 ### 👑 Trưởng nhóm
 | Công việc | Trạng thái |
