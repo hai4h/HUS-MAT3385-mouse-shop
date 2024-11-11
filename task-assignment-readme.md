@@ -50,12 +50,17 @@
 |-----------|------------|
 | Làm trang sản phẩm | 🔄 Đang thực hiện |
 | Trang đăng nhập/đăng ký user | 🔄 Đang thực hiện |
+| Tích hợp chức năng giỏ hàng | 🔄 Đang thực hiện |
+| Xây dựng form đăng ký/đăng nhập | 🔄 Đang thực hiện |
+| Tích hợp API với Backend | 🔄 Đang thực hiện |
 
 ### 👨‍💻 Frontend Developer 2 (Admin Interface)
 | Công việc | Trạng thái |
 |-----------|------------|
-| Dashboard Overview | 🔄 Đang thực hiện |
+| Hoàn thiện trang Overview cho admin | 🔄 Đang thực hiện |
 | Quản lý sản phẩm (CRUD) | 🔄 Đang thực hiện |
+| Xây dựng trang quản lý danh mục | 🔄 Đang thực hiện |
+| Tích hợp API với Backend | 🔄 Đang thực hiện |
 
 ### 👨‍💻 Backend Developer
 | Công việc | Trạng thái |
@@ -63,4 +68,6 @@
 | Xây dựng API authentication | 🔄 Đang thực hiện |
 | API quản lý sản phẩm | 🔄 Đang thực hiện |
 | API quản lý user | 🔄 Đang thực hiện |
+| Thiết lập Docker container cho development | 🔄 Đang thực hiện |
+| Viết unit test cho các API đã phát triển | 🔄 Đang thực hiện |
 
