@@ -42,32 +42,32 @@
 ### 👑 Trưởng nhóm
 | Công việc | Trạng thái |
 |-----------|------------|
-| Kiểm tra tiến độ và code review | 🔄 Đang thực hiện |
-| Bắt đầu viết tài liệu hệ thống | 🔄 Đang thực hiện |
+| Kiểm tra tiến độ và code review | ⏸️ Tạm hoãn |
+| Bắt đầu viết tài liệu hệ thống | ⏸️ Tạm hoãn |
 
 ### 👨‍💻 Frontend Developer 1 (User Interface)
 | Công việc | Trạng thái |
 |-----------|------------|
-| Làm trang sản phẩm | 🔄 Đang thực hiện |
-| Trang đăng nhập/đăng ký user | 🔄 Đang thực hiện |
-| Tích hợp chức năng giỏ hàng | 🔄 Đang thực hiện |
-| Xây dựng form đăng ký/đăng nhập | 🔄 Đang thực hiện |
-| Tích hợp API với Backend | 🔄 Đang thực hiện |
+| Làm trang sản phẩm | ⏸️ Tạm hoãn |
+| Trang đăng nhập/đăng ký user | ⏸️ Tạm hoãn |
+| Tích hợp chức năng giỏ hàng | ⏸️ Tạm hoãn |
+| Xây dựng form đăng ký/đăng nhập | ⏸️ Tạm hoãn |
+| Tích hợp API với Backend | ⏸️ Tạm hoãn |
 
 ### 👨‍💻 Frontend Developer 2 (Admin Interface)
 | Công việc | Trạng thái |
 |-----------|------------|
-| Hoàn thiện trang Overview cho admin | 🔄 Đang thực hiện |
-| Quản lý sản phẩm (CRUD) | 🔄 Đang thực hiện |
-| Xây dựng trang quản lý danh mục | 🔄 Đang thực hiện |
-| Tích hợp API với Backend | 🔄 Đang thực hiện |
+| Hoàn thiện trang Overview cho admin | ⏸️ Tạm hoãn |
+| Quản lý sản phẩm (CRUD) | ⏸️ Tạm hoãn |
+| Xây dựng trang quản lý danh mục | ⏸️ Tạm hoãn |
+| Tích hợp API với Backend | ⏸️ Tạm hoãn |
 
 ### 👨‍💻 Backend Developer
 | Công việc | Trạng thái |
 |-----------|------------|
-| Xây dựng API authentication | 🔄 Đang thực hiện |
-| API quản lý sản phẩm | 🔄 Đang thực hiện |
-| API quản lý user | 🔄 Đang thực hiện |
-| Thiết lập Docker container cho development | 🔄 Đang thực hiện |
-| Viết unit test cho các API đã phát triển | 🔄 Đang thực hiện |
+| Xây dựng API authentication | ⏸️ Tạm hoãn |
+| API quản lý sản phẩm | ⏸️ Tạm hoãn |
+| API quản lý user | ⏸️ Tạm hoãn |
+| Thiết lập Docker container cho development | ⏸️ Tạm hoãn |
+| Viết unit test cho các API đã phát triển | ⏸️ Tạm hoãn |
 
