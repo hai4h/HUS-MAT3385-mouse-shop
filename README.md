@@ -47,7 +47,7 @@ mouse-shop/
 
 ## Yêu cầu hệ thống
 - Docker và Docker Compose
-- Node.js 23.x (cho development)
+- Node.js 22.10 LTS (cho development)
 - Python 3.10.* (cho development)
 - MySQL 8.0
 
