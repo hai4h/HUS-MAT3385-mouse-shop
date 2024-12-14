@@ -1,0 +1,115 @@
+.user-sidebar {
+    padding: 20px;
+    height: calc(100vh - 40px); /* Trừ đi khoảng 50px cho taskbar */
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+  
+    .user-sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+  
+      h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+  
+      .close-button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+      }
+    }
+  
+    .user-info {
+      flex: 1;
+  
+      .info-item {
+        margin-bottom: 15px;
+        
+        label {
+          display: block;
+          color: #666;
+          margin-bottom: 5px;
+        }
+  
+        span {
+          font-size: 16px;
+        }
+      }
+    }
+  
+    .user-actions {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 20px;
+    
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    
+        &.admin-button {
+          background-color: #4CAF50;
+          color: white;
+    
+          &:hover {
+            background-color: #45a049;
+          }
+        }
+    
+        &.logout-button {
+          background-color: #f44336;
+          color: white;
+    
+          &:hover {
+            background-color: #da190b;
+          }
+        }
+      }
+    }
+  }
+
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+  
+    &.active {
+      right: 0;
+    }
+  }
+  
+  // Điều chỉnh overlay hiện có
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+  
+    &.active {
+      display: block;
+    }
+  }
