@@ -38,7 +38,7 @@ export const useAdminAuth = () => {
     localStorage.removeItem('adminUser');
     setAdminUser(null);
     setIsAuthenticated(false);
-    window.location.href = 'http://localhost:3000/login';
+    window.location.href = 'http://localhost:3000/';
   }, []);
 
   // Thiết lập kiểm tra token định kỳ

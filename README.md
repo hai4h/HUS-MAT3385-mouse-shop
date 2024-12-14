@@ -6,7 +6,7 @@
 
 # Quy trình chạy:
 
-## Backend
+## Backend (port 8000)
 ```
 cd backend
 python -m venv venv
@@ -16,14 +16,14 @@ pip install -r requirements.txt # dành cho lần chạy đầu tiên
 uvicorn src.main:app --reload
 ```
 
-## Frontend User
+## Frontend User (port 3000)
 ```
 cd frontend-user
 npm install # dành cho lần chạy đầu tiên
 npm start
 ```
 
-## Frontend Admin
+## Frontend Admin (port 3001)
 ```
 cd frontend-admin
 npm install # dành cho lần chạy đầu tiên
