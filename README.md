@@ -9,7 +9,7 @@
 ## Backend (port 8000)
 ```
 cd backend
-python -m venv venv
+python -m venv venv # dành cho lần chạy đầu tiên
 source venv/bin/activate  # Linux/Mac
 .\venv\Scripts\activate   # Windows
 pip install -r requirements.txt # dành cho lần chạy đầu tiên
