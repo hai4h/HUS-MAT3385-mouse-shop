@@ -12,7 +12,7 @@ import os
 # Import schemas, database
 from .schemas import TechnicalSpec, User, UserCreate, Product, ProductCreate, Token, TokenData
 from .database import get_db_connection
-from .config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from .config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, ADMIN_TOKEN_EXPIRE_MINUTES
 
 # Password hashing configuration
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -40,9 +40,11 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def create_access_token(data: dict):
+def create_access_token(data: dict, is_admin: bool = False):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # Chọn thời gian hết hạn dựa vào role
+    expire_minutes = ADMIN_TOKEN_EXPIRE_MINUTES if is_admin else ACCESS_TOKEN_EXPIRE_MINUTES
+    expire = datetime.utcnow() + timedelta(minutes=expire_minutes)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -94,11 +96,15 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    access_token = create_access_token(data={
-        "sub": user["username"],
-        "user_id": user["user_id"],
-        "role": user["role"]
-    })
+    is_admin = user["role"] == "admin"
+    access_token = create_access_token(
+        data={
+            "sub": user["username"],
+            "user_id": user["user_id"],
+            "role": user["role"]
+        },
+        is_admin=is_admin  # Truyền thông tin role
+    )
     
     return {
         "access_token": access_token,

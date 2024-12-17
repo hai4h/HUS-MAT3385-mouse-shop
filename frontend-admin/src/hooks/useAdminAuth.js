@@ -5,6 +5,7 @@ export const useAdminAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [adminUser, setAdminUser] = useState(null);
+  const [showSessionTimeout, setShowSessionTimeout] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,7 +27,7 @@ export const useAdminAuth = () => {
       if (tokenParts.length !== 3) return true;
 
       const payload = JSON.parse(atob(tokenParts[1]));
-      const expiration = payload.exp * 1000; // Convert to milliseconds
+      const expiration = payload.exp * 1000;
       return Date.now() >= expiration;
     } catch (error) {
       console.error('Token validation error:', error);
@@ -38,42 +39,53 @@ export const useAdminAuth = () => {
     localStorage.removeItem('adminUser');
     setAdminUser(null);
     setIsAuthenticated(false);
-    window.location.href = 'http://localhost:3000/';
+    window.location.href = 'http://localhost:3000';
+  }, []);
+
+  const handleSessionTimeout = useCallback(() => {
+      setShowSessionTimeout(true);  // Chỉ hiển thị modal
+  }, []);
+
+  // Thêm hàm mới để xử lý khi người dùng xác nhận modal
+  const handleSessionTimeoutConfirm = useCallback(() => {
+      localStorage.removeItem('adminUser');
+      setAdminUser(null);
+      setIsAuthenticated(false);
+      setShowSessionTimeout(false);
+      window.location.href = 'http://localhost:3000?adminLogout=true';
   }, []);
 
   // Thiết lập kiểm tra token định kỳ
   useEffect(() => {
-    const checkTokenAndLogout = () => {
+    const checkTokenAndNotify = () => {
       const storedUser = localStorage.getItem('adminUser');
       if (storedUser) {
         const userData = JSON.parse(storedUser);
         if (checkTokenExpiration(userData.access_token)) {
-          console.log('Token expired, logging out...');
-          handleLogout();
+          console.log('Token expired, showing notification...');
+          handleSessionTimeout();
         }
       }
     };
 
     // Kiểm tra ngay lập tức
-    checkTokenAndLogout();
+    checkTokenAndNotify();
 
     // Thiết lập interval kiểm tra mỗi phút
-    const intervalId = setInterval(checkTokenAndLogout, 30000);
+    const intervalId = setInterval(checkTokenAndNotify, 5000);
 
     return () => clearInterval(intervalId);
-  }, [checkTokenExpiration, handleLogout]);
+  }, [checkTokenExpiration, handleSessionTimeout]);
 
   // Khởi tạo authentication
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Kiểm tra token trong URL
         const { token, userId, username, role } = parseToken();
         
         if (token && role === 'admin') {
-          // Kiểm tra token hết hạn trước khi lưu
           if (checkTokenExpiration(token)) {
-            handleLogout();
+            handleSessionTimeout();
             return;
           }
 
@@ -86,11 +98,8 @@ export const useAdminAuth = () => {
           localStorage.setItem('adminUser', JSON.stringify(adminData));
           setAdminUser(adminData);
           setIsAuthenticated(true);
-          
-          // Xóa params và điều hướng đến overview
           navigate('/overview', { replace: true });
         } else {
-          // Kiểm tra localStorage nếu không có token trong URL
           const storedUser = localStorage.getItem('adminUser');
           if (storedUser) {
             const userData = JSON.parse(storedUser);
@@ -98,7 +107,7 @@ export const useAdminAuth = () => {
               setAdminUser(userData);
               setIsAuthenticated(true);
             } else {
-              handleLogout();
+              handleSessionTimeout();
             }
           } else {
             handleLogout();
@@ -113,7 +122,7 @@ export const useAdminAuth = () => {
     };
 
     initAuth();
-  }, [navigate, parseToken, checkTokenExpiration, handleLogout]);
+  }, [navigate, parseToken, checkTokenExpiration, handleSessionTimeout]);
 
   const getAuthHeader = useCallback(() => {
     const storedUser = localStorage.getItem('adminUser');
@@ -133,6 +142,9 @@ export const useAdminAuth = () => {
     isLoading,
     adminUser,
     logout: handleLogout,
+    showSessionTimeout,
+    setShowSessionTimeout,
+    handleSessionTimeoutConfirm,
     getAuthHeader
   };
 };

@@ -1,6 +1,6 @@
 // src/components/ProtectedRoute.jsx
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+// import { Navigate } from 'react-router-dom';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import MainLayout from './MainLayout';
 
@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    window.location.href = 'http://localhost:3000/';
+    window.location.href = 'http://localhost:3000';
     return null;
   }
 

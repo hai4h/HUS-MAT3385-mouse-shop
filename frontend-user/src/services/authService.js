@@ -69,6 +69,23 @@ class AuthService {
         localStorage.removeItem('user');
     }
 
+    // isTokenExpired() {
+    //     const user = this.getCurrentUser();
+    //     if (!user?.access_token) return true;
+
+    //     try {
+    //         const token = user.access_token;
+    //         const tokenParts = token.split('.');
+    //         if (tokenParts.length !== 3) return true;
+
+    //         const payload = JSON.parse(atob(tokenParts[1]));
+    //         const expiration = payload.exp * 1000;
+    //         return Date.now() >= expiration;
+    //     } catch {
+    //         return true;
+    //     }
+    // }
+
     isTokenExpired() {
         const user = this.getCurrentUser();
         if (!user?.access_token) return true;
@@ -80,7 +97,8 @@ class AuthService {
 
             const payload = JSON.parse(atob(tokenParts[1]));
             const expiration = payload.exp * 1000;
-            return Date.now() >= expiration;
+            // Thêm buffer 5 giây để tránh edge cases
+            return Date.now() >= (expiration - 5000);
         } catch {
             return true;
         }
