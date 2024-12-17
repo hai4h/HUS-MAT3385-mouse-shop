@@ -3,12 +3,13 @@ import authService from "../services/authService";
 import axiosInstance from "../services/axiosConfig";
 
 import "../views/App.scss";
-import "../views/productpage/ProductPage.scss"
-import "../views/login-signup/LoginSignup.scss"
-import "../views/user/UserSidebar.scss"
+import "../views/productpage/ProductPage.scss";
+import "../views/login-signup/LoginSignup.scss";
+import "../views/user/UserSidebar.scss";
 
 import LoginForm from "../views/login-signup/LoginForm";
 import SignupForm from "../views/login-signup/SignupForm";
+import ForgotPassword from "../views/login-signup/ForgotPassword";
 import UserSidebar from "../views/user/UserSidebar";
 import Cart from "../views/productpage/Cart";
 import ProductPage from "../views/productpage/ProductPage";
@@ -26,14 +27,15 @@ class MyComponent extends Component {
       showSignup: false,
       showCart: false,
       showUserSidebar: false,
+      showForgotPassword: false,
       cartItems: [],
       user: authService.getCurrentUser(),
-      searchQuery: ""
+      searchQuery: "",
     };
   }
 
   componentDidMount() {
-    document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener("click", this.handleDocumentClick);
     // Kiểm tra token ngay khi component mount
     this.checkAndUpdateUserAuth();
     // Thiết lập kiểm tra định kỳ
@@ -41,7 +43,7 @@ class MyComponent extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener("click", this.handleDocumentClick);
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
@@ -50,7 +52,7 @@ class MyComponent extends Component {
   // Thêm method mới để kiểm tra và cập nhật trạng thái authentication
   checkAndUpdateUserAuth = () => {
     const currentUser = authService.getCurrentUser();
-    
+
     if (currentUser && !authService.isTokenExpired()) {
       // Token hợp lệ, cập nhật state
       this.setState({ user: currentUser });
@@ -66,7 +68,7 @@ class MyComponent extends Component {
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
-    
+
     // Thiết lập interval mới (30 giây)
     this.tokenCheckInterval = setInterval(() => {
       this.checkAndUpdateUserAuth();
@@ -75,81 +77,92 @@ class MyComponent extends Component {
 
   toggleSearch = (event) => {
     event.stopPropagation();
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showSearch: !prevState.showSearch,
       showLogin: false,
       showSignup: false,
       showCart: false,
-      showUserSidebar: false
+      showUserSidebar: false,
     }));
   };
 
   toggleLogin = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showLogin: !prevState.showLogin,
       showSignup: false,
       showSearch: false,
       showCart: false,
-      showUserSidebar: false
+      showUserSidebar: false,
     }));
   };
 
   toggleSignup = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showSignup: !prevState.showSignup,
       showLogin: false,
       showSearch: false,
       showCart: false,
-      showUserSidebar: false
+      showUserSidebar: false,
     }));
   };
 
   toggleCart = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showCart: !prevState.showCart,
       showSearch: false,
       showLogin: false,
       showSignup: false,
-      showUserSidebar: false
+      showUserSidebar: false,
     }));
   };
 
   toggleUserSidebar = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showUserSidebar: !prevState.showUserSidebar,
       showSearch: false,
       showLogin: false,
       showSignup: false,
-      showCart: false
+      showCart: false,
     }));
   };
 
   handleLoginSuccess = async (userData) => {
     try {
-      await this.setState({ 
+      await this.setState({
         user: userData,
         showLogin: false,
-        showSignup: false
+        showSignup: false,
       });
-      
+
       this.setupTokenCheck();
     } catch (error) {
-      console.error('Error handling login success:', error);
+      console.error("Error handling login success:", error);
     }
   };
 
   handleSignupSuccess = async (userData) => {
     try {
-      await this.setState({ 
+      await this.setState({
         user: userData,
         showLogin: false,
-        showSignup: false
+        showSignup: false,
       });
-      
+
       this.setupTokenCheck();
     } catch (error) {
-      console.error('Error handling signup success:', error);
+      console.error("Error handling signup success:", error);
     }
+  };
+
+  handleForgotPasswordSuccess = (response) => {
+    // Hiển thị thông báo thành công
+    this.setState({
+      showForgotPassword: false,
+      showLogin: true,
+    });
+
+    // Có thể thêm toast notification hoặc alert ở đây
+    alert("Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.");
   };
 
   handleLogout = () => {
@@ -165,15 +178,15 @@ class MyComponent extends Component {
   };
 
   handleDocumentClick = (event) => {
-    const searchContainer = event.target.closest('.search-input-container');
-    const searchIcon = event.target.closest('.icon.search');
-    const cartContainer = event.target.closest('.cart-sidebar');
-    const cartIcon = event.target.closest('.icon.cart');
-    const userSidebarContainer = event.target.closest('.sidebar-container');
-    const userIcon = event.target.closest('.icon.user');
-    const authContainer = event.target.closest('.login-signup-sidebar');
-    const authIcon = event.target.closest('.icon.login');
-    
+    const searchContainer = event.target.closest(".search-input-container");
+    const searchIcon = event.target.closest(".icon.search");
+    const cartContainer = event.target.closest(".cart-sidebar");
+    const cartIcon = event.target.closest(".icon.cart");
+    const userSidebarContainer = event.target.closest(".sidebar-container");
+    const userIcon = event.target.closest(".icon.user");
+    const authContainer = event.target.closest(".login-signup-sidebar");
+    const authIcon = event.target.closest(".icon.login");
+
     if (!searchContainer && !searchIcon && this.state.showSearch) {
       this.setState({ showSearch: false });
     }
@@ -186,36 +199,50 @@ class MyComponent extends Component {
       this.setState({ showUserSidebar: false });
     }
 
-    if (!authContainer && !authIcon && (this.state.showLogin || this.state.showSignup)) {
-      this.setState({ 
+    if (!authContainer && !authIcon && (this.state.showLogin || this.state.showSignup || this.state.showForgotPassword)) {
+      this.setState({
         showLogin: false,
-        showSignup: false
+        showSignup: false,
+        showForgotPassword: false,
       });
     }
   };
 
   render() {
-    const { 
-      showSearch, 
+    const {
+      showSearch,
       showLogin,
-      showSignup, 
-      showCart, 
-      showUserSidebar, 
-      cartItems, 
+      showSignup,
+      showCart,
+      showUserSidebar,
+      showForgotPassword,
+      cartItems,
       user,
-      searchQuery 
+      searchQuery,
     } = this.state;
 
     return (
       <div className="app">
-        <div className={`overlay ${(showLogin || showSignup || showCart || showUserSidebar) ? 'active' : ''}`} />
+        <div
+          className={`overlay ${
+            showLogin ||
+            showSignup ||
+            showCart ||
+            showUserSidebar ||
+            showForgotPassword
+              ? "active"
+              : ""
+          }`}
+        />
 
         <header className="header">
           <div className="logo">X</div>
-          
-          <div className={`search-input-container ${!showSearch ? 'hidden' : ''}`}>
-            <input 
-              type="text" 
+
+          <div
+            className={`search-input-container ${!showSearch ? "hidden" : ""}`}
+          >
+            <input
+              type="text"
               placeholder="Tìm kiếm..."
               value={searchQuery}
               onChange={(e) => this.setState({ searchQuery: e.target.value })}
@@ -227,7 +254,7 @@ class MyComponent extends Component {
             <span className="icon search" onClick={this.toggleSearch}>
               <SearchIcon style={{ color: "red" }} />
             </span>
-            
+
             {user ? (
               <span className="icon user" onClick={this.toggleUserSidebar}>
                 <AccountCircleIcon style={{ color: "red" }} />
@@ -249,51 +276,86 @@ class MyComponent extends Component {
 
         <ProductPage onAddToCart={this.addToCart} />
 
-        <div className={`login-signup-sidebar ${showLogin || showSignup ? 'active' : ''}`}>
+        <div
+          className={`login-signup-sidebar ${
+            showLogin || showSignup || showForgotPassword ? "active" : ""
+          }`}
+        >
           <div className="form-toggle">
-            <button
-              className={`toggle-btn ${showLogin ? "active" : ""}`}
-              onClick={() => this.setState({ 
-                showLogin: true, 
-                showSignup: false,
-                error: null 
-              })}
-            >
-              Login
-            </button>
-            <button
-              className={`toggle-btn ${showSignup ? "active" : ""}`}
-              onClick={() => this.setState({ 
-                showSignup: true, 
-                showLogin: false,
-                error: null 
-              })}
-            >
-              Sign Up
-            </button>
+            {!showForgotPassword && (
+              <>
+                <button
+                  className={`toggle-btn ${showLogin ? "active" : ""}`}
+                  onClick={() =>
+                    this.setState({
+                      showLogin: true,
+                      showSignup: false,
+                      showForgotPassword: false,
+                      error: null,
+                    })
+                  }
+                >
+                  Login
+                </button>
+                <button
+                  className={`toggle-btn ${showSignup ? "active" : ""}`}
+                  onClick={() =>
+                    this.setState({
+                      showSignup: true,
+                      showLogin: false,
+                      showForgotPassword: false,
+                      error: null,
+                    })
+                  }
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
 
-          {showLogin && (
-            <LoginForm 
+          {showLogin && !showForgotPassword && (
+            <LoginForm
               onClose={() => this.setState({ showLogin: false })}
               onLoginSuccess={this.handleLoginSuccess}
-              onForgotPassword={() => this.setState({ 
-                showLogin: false, 
-                showForgotPassword: true 
-              })}
+              onForgotPassword={() =>
+                this.setState({
+                  showLogin: false,
+                  showForgotPassword: true,
+                })
+              }
             />
           )}
-          
+
           {showSignup && (
             <SignupForm
               onClose={() => this.setState({ showSignup: false })}
               onSignupSuccess={this.handleSignupSuccess}
             />
           )}
+
+          {showForgotPassword && (
+            <ForgotPassword
+              onCancel={() =>
+                this.setState({
+                  showForgotPassword: false,
+                  showLogin: true,
+                })
+              }
+              onForgotPasswordSuccess={() =>
+                this.setState({
+                  showForgotPassword: false,
+                  showLogin: true,
+                })
+              }
+            />
+          )}
         </div>
 
         {user && (
-          <div className={`sidebar-container ${showUserSidebar ? 'active' : ''}`}>
+          <div
+            className={`sidebar-container ${showUserSidebar ? "active" : ""}`}
+          >
             <UserSidebar
               user={user}
               onClose={this.toggleUserSidebar}
@@ -302,7 +364,7 @@ class MyComponent extends Component {
           </div>
         )}
 
-        <div className={`cart-sidebar ${showCart ? 'active' : ''}`}>
+        <div className={`cart-sidebar ${showCart ? "active" : ""}`}>
           <Cart
             cartItems={cartItems}
             onClose={this.toggleCart}
