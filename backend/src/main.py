@@ -157,7 +157,7 @@ async def list_users(current_user: User = Depends(get_current_user)):
     return users
 
 @app.get("/users/{user_id}", response_model=User)
-async def get_user(user_id: int, current_user: User = Depends(get_current_user)):
+async def get_user(user_id: int, current_user: User = Depends(get_current_user)):  
 
     if current_user["role"] != "admin" and current_user["user_id"] != user_id:
         raise HTTPException(status_code=403, detail="Not authorized")
@@ -175,104 +175,189 @@ async def get_user(user_id: int, current_user: User = Depends(get_current_user))
 # Product endpoints
 @app.post("/products/", response_model=Product)
 async def create_product(
-   request: Request,
-   current_user: User = Depends(get_current_user)
+    request: Request,
+    current_user: User = Depends(get_current_user)
 ):
-   if current_user["role"] != "admin":
-       raise HTTPException(status_code=403, detail="Not authorized")
-   
-   # Lấy body của request
-   body = await request.json()
-   
-   # Validate product data
-   product_data = body.get("product", {})
-   required_product_fields = ["name", "description", "price", "stock_quantity", 
-                            "hand_size", "grip_style", "is_wireless", "brand"]
-   
-   missing_product_fields = [field for field in required_product_fields 
-                           if field not in product_data or product_data[field] is None]
-   
-   if missing_product_fields:
-       raise HTTPException(
-           status_code=400,
-           detail={
-               "error": "Missing required product fields",
-               "missing_fields": missing_product_fields
-           }
-       )
-       
-   # Validate specs data
-   specs_data = body.get("specs", {})
-   required_specs_fields = ["dpi", "weight_g", "length_mm", "width_mm", "height_mm",
-                          "sensor_type", "polling_rate", "switch_type", 
-                          "switch_durability", "connectivity", "battery_life",
-                          "cable_type", "rgb_lighting", "programmable_buttons",
-                          "memory_profiles"]
-                          
-   missing_specs_fields = [field for field in required_specs_fields 
-                         if field not in specs_data or specs_data[field] is None]
-   
-   if missing_specs_fields:
-       raise HTTPException(
-           status_code=400,
-           detail={
-               "error": "Missing required technical specification fields",
-               "missing_fields": missing_specs_fields
-           }
-       )
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        # Lấy và validate body của request
+        body = await request.json()
+        if not isinstance(body, dict):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid request body format - must be a JSON object"
+            )
 
-   # Create product model
-   product = ProductCreate(**product_data)
-   specs = TechnicalSpec(**specs_data)
-   
-   conn = get_db_connection()
-   cursor = conn.cursor(dictionary=True)
-   
-   try:
-       # Insert product
-       cursor.execute(
-           """INSERT INTO products 
-              (name, description, price, stock_quantity, hand_size, 
-               grip_style, is_wireless, brand)
-              VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-           (product.name, product.description, product.price, 
-            product.stock_quantity, product.hand_size, product.grip_style,
-            product.is_wireless, product.brand)
-       )
-       conn.commit()
-       new_product_id = cursor.lastrowid
-       
-       # Insert technical specs
-       cursor.execute(
-           """INSERT INTO technical_specs
-              (product_id, dpi, weight_g, length_mm, width_mm, height_mm,
-               sensor_type, polling_rate, switch_type, switch_durability,
-               connectivity, battery_life, cable_type, rgb_lighting,
-               programmable_buttons, memory_profiles)
-              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
-                      %s, %s, %s)""",
-           (new_product_id, specs.dpi, specs.weight_g, specs.length_mm,
-            specs.width_mm, specs.height_mm, specs.sensor_type,
-            specs.polling_rate, specs.switch_type, specs.switch_durability,
-            specs.connectivity, specs.battery_life, specs.cable_type,
-            specs.rgb_lighting, specs.programmable_buttons,
-            specs.memory_profiles)
-       )
-       conn.commit()
-       
-       cursor.execute(
-           """SELECT p.*, t.*
-              FROM products p
-              LEFT JOIN technical_specs t ON p.product_id = t.product_id
-              WHERE p.product_id = %s""",
-           (new_product_id,)
-       )
-       new_product = cursor.fetchone()
-       return new_product
+        # Validate product data structure
+        product_data = body.get("product")
+        specs_data = body.get("specs")
+        
+        if not product_data or not specs_data:
+            raise HTTPException(
+                status_code=400,
+                detail="Request body must contain both 'product' and 'specs' objects"
+            )
 
-   finally:
-       cursor.close()
-       conn.close()
+        # Check for duplicate product name
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            # Case-insensitive check for existing product name
+            cursor.execute(
+                "SELECT product_id FROM products WHERE LOWER(name) = LOWER(%s)",
+                (product_data.get("name", ""),)
+            )
+            existing_product = cursor.fetchone()
+            
+            if existing_product:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"A product with the name '{product_data.get('name')}' already exists"
+                )
+
+            # Validate product fields
+            required_product_fields = {
+                "name": str,
+                "description": str,
+                "price": (int, float),
+                "stock_quantity": int,
+                "hand_size": str,
+                "grip_style": str,
+                "is_wireless": bool,
+                "brand": str
+            }
+
+            product_errors = []
+            for field, expected_type in required_product_fields.items():
+                value = product_data.get(field)
+                if value is None:
+                    product_errors.append(f"Missing required field: {field}")
+                elif not isinstance(value, expected_type):
+                    product_errors.append(f"Invalid type for {field}: expected {expected_type.__name__}, got {type(value).__name__}")
+                elif isinstance(value, str) and not value.strip():
+                    product_errors.append(f"Field {field} cannot be empty")
+                elif field in ["price", "stock_quantity"] and value <= 0:
+                    product_errors.append(f"Field {field} must be greater than 0")
+                elif field == "hand_size" and value not in ["small", "medium", "large"]:
+                    product_errors.append("hand_size must be one of: small, medium, large")
+                elif field == "grip_style" and value not in ["palm", "claw", "fingertip"]:
+                    product_errors.append("grip_style must be one of: palm, claw, fingertip")
+
+            # Validate specs fields
+            required_specs_fields = {
+                "dpi": int,
+                "weight_g": (int, float),
+                "length_mm": (int, float),
+                "width_mm": (int, float),
+                "height_mm": (int, float),
+                "sensor_type": str,
+                "polling_rate": int,
+                "switch_type": str,
+                "switch_durability": int,
+                "connectivity": str,
+                "battery_life": int,
+                "cable_type": str,
+                "rgb_lighting": bool,
+                "programmable_buttons": int,
+                "memory_profiles": str
+            }
+
+            specs_errors = []
+            for field, expected_type in required_specs_fields.items():
+                value = specs_data.get(field)
+                if value is None:
+                    specs_errors.append(f"Missing required field: {field}")
+                elif not isinstance(value, expected_type):
+                    specs_errors.append(f"Invalid type for {field}: expected {expected_type.__name__}, got {type(value).__name__}")
+                elif isinstance(value, str) and not value.strip():
+                    specs_errors.append(f"Field {field} cannot be empty")
+                elif field in ["dpi", "polling_rate", "switch_durability", "battery_life", "programmable_buttons"] and value <= 0:
+                    specs_errors.append(f"Field {field} must be greater than 0")
+                elif field in ["weight_g", "length_mm", "width_mm", "height_mm"] and value <= 0:
+                    specs_errors.append(f"Field {field} must be greater than 0")
+
+            # If any validation errors occurred, return them all at once
+            all_errors = product_errors + specs_errors
+            if all_errors:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "message": "Validation failed",
+                        "errors": all_errors
+                    }
+                )
+
+            # Create product model
+            product = ProductCreate(**product_data)
+            specs = TechnicalSpec(**specs_data)
+
+            # Insert product
+            cursor.execute(
+                """INSERT INTO products 
+                   (name, description, price, stock_quantity, hand_size, 
+                    grip_style, is_wireless, brand)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (product.name, product.description, product.price, 
+                 product.stock_quantity, product.hand_size, product.grip_style,
+                 product.is_wireless, product.brand)
+            )
+            conn.commit()
+            new_product_id = cursor.lastrowid
+            
+            # Insert technical specs
+            cursor.execute(
+                """INSERT INTO technical_specs
+                   (product_id, dpi, weight_g, length_mm, width_mm, height_mm,
+                    sensor_type, polling_rate, switch_type, switch_durability,
+                    connectivity, battery_life, cable_type, rgb_lighting,
+                    programmable_buttons, memory_profiles)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                           %s, %s, %s)""",
+                (new_product_id, specs.dpi, specs.weight_g, specs.length_mm,
+                 specs.width_mm, specs.height_mm, specs.sensor_type,
+                 specs.polling_rate, specs.switch_type, specs.switch_durability,
+                 specs.connectivity, specs.battery_life, specs.cable_type,
+                 specs.rgb_lighting, specs.programmable_buttons,
+                 specs.memory_profiles)
+            )
+            conn.commit()
+            
+            # Fetch the newly created product with its specs
+            cursor.execute(
+                """SELECT p.*, t.*
+                   FROM products p
+                   LEFT JOIN technical_specs t ON p.product_id = t.product_id
+                   WHERE p.product_id = %s""",
+                (new_product_id,)
+            )
+            new_product = cursor.fetchone()
+            return new_product
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            conn.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error: {str(e)}"
+            )
+        finally:
+            cursor.close()
+            conn.close()
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid data format: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 @app.get("/products/", response_model=List[Product])
 async def list_products(
@@ -286,7 +371,7 @@ async def list_products(
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    query = """SELECT p.*, t.*
+    query = """SELECT DISTINCT p.*, t.*
                FROM products p
                LEFT JOIN technical_specs t ON p.product_id = t.product_id
                WHERE p.is_active = TRUE"""

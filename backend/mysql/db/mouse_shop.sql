@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2024 at 02:06 PM
+-- Generation Time: Dec 18, 2024 at 06:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -163,7 +163,7 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_qua
 (2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 50, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
 (3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 40, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
 (4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 30, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
-(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 79.99, 25, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 09:17:27');
+(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 25, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15');
 
 -- --------------------------------------------------------
 
@@ -204,7 +204,7 @@ CREATE TABLE `sessions` (
 
 CREATE TABLE `technical_specs` (
   `spec_id` bigint(20) UNSIGNED NOT NULL,
-  `product_id` int(11) DEFAULT NULL,
+  `product_id` bigint(20) UNSIGNED DEFAULT NULL,
   `dpi` int(11) DEFAULT NULL,
   `weight_g` decimal(6,2) DEFAULT NULL,
   `length_mm` decimal(6,2) DEFAULT NULL,
@@ -381,7 +381,8 @@ ALTER TABLE `sessions`
 -- Indexes for table `technical_specs`
 --
 ALTER TABLE `technical_specs`
-  ADD PRIMARY KEY (`spec_id`);
+  ADD PRIMARY KEY (`spec_id`),
+  ADD UNIQUE KEY `unique_product_id` (`product_id`);
 
 --
 -- Indexes for table `traffic_analytics`
@@ -498,6 +499,16 @@ ALTER TABLE `user_preferences`
 --
 ALTER TABLE `user_reviews`
   MODIFY `review_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `technical_specs`
+--
+ALTER TABLE `technical_specs`
+  ADD CONSTRAINT `fk_product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
