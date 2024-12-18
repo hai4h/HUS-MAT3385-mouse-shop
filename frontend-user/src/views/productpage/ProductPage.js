@@ -2,67 +2,61 @@ import React, { Component } from "react";
 import "../../views/App.scss";
 import "./ProductPage.scss";
 import Product from "./Product";
+import axiosInstance from "../../services/axiosConfig";
 
 class ProductPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: [
-        {
-          id: "1",
-          name: "Logitech MX Master 3",
-          description: "Chuột không dây cao cấp với thiết kế công thái học, hỗ trợ nhiều thiết bị.",
-          price: "2,500,000",
-          stock_quantity: 15,
-          hand_size: "L",
-          grip_style: "Palm",
-          brand: "Logitech",
-        },
-        {
-          id: "2",
-          name: "Razer DeathAdder V2",
-          description: "Chuột gaming với độ chính xác cao, cảm biến quang học 20,000 DPI.",
-          price: "1,800,000",
-          stock_quantity: 20,
-          hand_size: "M",
-          grip_style: "Claw",
-          brand: "Razer",
-        },
-        {
-          id: "3",
-          name: "SteelSeries Rival 600",
-          description: "Chuột gaming với cảm biến kép, tùy chỉnh trọng lượng linh hoạt.",
-          price: "2,200,000",
-          stock_quantity: 10,
-          hand_size: "L",
-          grip_style: "Fingertip",
-          brand: "SteelSeries",
-        },
-      ],
+      products: [],
+      loading: true,
+      error: null
     };
   }
-  render() {
-    const productCards = [...this.state.products];
-    // Thêm các product trống nếu mảng có ít hơn 4 phần tử
-    while (productCards.length < 4) {
-      productCards.push(null);
+
+  // Fetch products when component mounts
+  async componentDidMount() {
+    try {
+      const response = await axiosInstance.get('/products/');
+      this.setState({
+        products: response.data,
+        loading: false
+      });
+    } catch (error) {
+      this.setState({
+        error: "Failed to load products",
+        loading: false
+      });
     }
+  }
+
+  render() {
+    const { products, loading, error } = this.state;
+
+    if (loading) {
+      return <div className="loading">Loading products...</div>;
+    }
+
+    if (error) {
+      return <div className="error">{error}</div>;
+    }
+
     return (
-      <div className="product-page">
-        <header>
-          <h1>Mice</h1>
-        </header>
-        <div className="products">
-          <div className="sidebar-filters">
-            <div class="text-with-icon">
-              <svg
+          <div className="product-page">
+            <header>
+              <h1>Mice</h1>
+            </header>
+          <div className="products">
+            <div className="sidebar-filters">
+              <div className="text-with-icon">
+                <svg
                 role="presentation"
                 fill="none"
                 focusable="false"
-                stroke-width="2"
+                strokeWidth="2"
                 width="20"
                 height="14"
-                class="icon-subdued icon icon-filter"
+                className="icon-subdued icon icon-filter"
                 viewBox="0 0 20 14"
               >
                 <path
@@ -84,37 +78,42 @@ class ProductPage extends Component {
                 <circle cx="7" cy="3" r="2" stroke="currentColor"></circle>
                 <circle cx="13" cy="11" r="2" stroke="currentColor"></circle>
               </svg>
-              Filters
-            </div>
-            <div>
-              <label>
-                <input type="checkbox" />
-                Filter 1
-              </label>
-            </div>
-            <div>
-              <label>
-                <input type="checkbox" />
-                Filter 2
-              </label>
-            </div>
+                Filters
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox" />
+                  Filter 1
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox" />
+                  Filter 2
+                </label>
+              </div>
           </div>
-          {productCards.map((product, index) => (
-            <div key={index} className="product-card">
-              {product ? (
-                <>
-                  <p>{product.name}</p>
-                  <p>Giá: {product.price} VND</p>
-                  <button onClick={() => this.props.onAddToCart(product)}>
-                    Add to Cart
-                  </button>
-                </>
-              ) : (
-                // Hiển thị card trống
-                <p className="placeholder">Trống</p>
-              )}
+          
+          <div className="products-grid">
+          {products.map((product) => (
+            <div key={product.product_id} className="product-card">
+              <div className="product-name-container">
+                <h3 className="product-name">{product.name}</h3>
+              </div>
+              <div className="product-image">
+                {/* Placeholder cho ảnh sản phẩm */}
+              </div>
+              <div className="product-footer">
+                <p className="product-price">
+                  ${product.price.toLocaleString()}
+                </p>
+                <button onClick={() => this.props.onAddToCart(product)}>
+                  Add to Cart
+                </button>
+              </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
     );

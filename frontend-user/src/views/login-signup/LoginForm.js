@@ -96,13 +96,6 @@ class LoginForm extends Component {
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
-                    
-                    <span
-                        className="forgot-password"
-                        onClick={() => this.props.onForgotPassword?.()}
-                    >
-                        Forgot Password?
-                    </span>
                 </form>
             </div>
         );

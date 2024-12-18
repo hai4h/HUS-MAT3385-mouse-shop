@@ -158,9 +158,6 @@ async def list_users(current_user: User = Depends(get_current_user)):
 
 @app.get("/users/{user_id}", response_model=User)
 async def get_user(user_id: int, current_user: User = Depends(get_current_user)):
-    # In ra để debug
-    print(f"Request for user_id: {user_id}")
-    print(f"Current user: {current_user}")
 
     if current_user["role"] != "admin" and current_user["user_id"] != user_id:
         raise HTTPException(status_code=403, detail="Not authorized")
@@ -351,49 +348,14 @@ async def update_product(
    if current_user["role"] != "admin":
        raise HTTPException(status_code=403, detail="Not authorized")
 
-   # Validate product data
-   if not all([
-       product.name, product.description, product.price > 0,
-       product.stock_quantity > 0, product.hand_size,
-       product.grip_style, isinstance(product.is_wireless, bool),
-       product.brand
-   ]):
-       raise HTTPException(
-           status_code=400,
-           detail="All product fields must be provided with valid values"
-       )
-
-   # Validate technical specs
-   if not all([
-       specs.dpi > 0, specs.weight_g > 0,
-       specs.length_mm > 0, specs.width_mm > 0,
-       specs.height_mm > 0, specs.sensor_type,
-       specs.polling_rate > 0, specs.switch_type,
-       specs.switch_durability > 0, specs.connectivity,
-       specs.battery_life >= 0, specs.cable_type,
-       isinstance(specs.rgb_lighting, bool),
-       specs.programmable_buttons >= 0, specs.memory_profiles
-   ]):
-       raise HTTPException(
-           status_code=400,
-           detail="All technical specification fields must be provided with valid values"
-       )
-   
    conn = get_db_connection()
    cursor = conn.cursor(dictionary=True)
    
    try:
-       # Check product exists - Make sure to fetch the result
+       # Check if product exists
        cursor.execute("SELECT product_id FROM products WHERE product_id = %s", (product_id,))
-       result = cursor.fetchone()  # Important: fetch the result
-       if not result:
+       if not cursor.fetchone():
            raise HTTPException(status_code=404, detail="Product not found")
-
-       # Check duplicate name - Make sure to fetch the result
-       cursor.execute("SELECT product_id FROM products WHERE name = %s AND product_id != %s", 
-                     (product.name, product_id))
-       if cursor.fetchone():  # Important: fetch the result
-           raise HTTPException(status_code=400, detail="Product name already exists")
 
        # Update product
        cursor.execute(
@@ -407,39 +369,26 @@ async def update_product(
            product.is_wireless, product.brand, product_id)
        )
 
-       # Update technical specs
+       # Update technical specs - Sửa thành UPDATE thay vì INSERT
        cursor.execute(
-           """INSERT INTO technical_specs
-           (product_id, dpi, weight_g, length_mm, width_mm, height_mm,
-           sensor_type, polling_rate, switch_type, switch_durability,
-           connectivity, battery_life, cable_type, rgb_lighting,
-           programmable_buttons, memory_profiles)
-           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-           %s, %s, %s)
-           ON DUPLICATE KEY UPDATE
-           dpi=VALUES(dpi), weight_g=VALUES(weight_g),
-           length_mm=VALUES(length_mm), width_mm=VALUES(width_mm),
-           height_mm=VALUES(height_mm), sensor_type=VALUES(sensor_type),
-           polling_rate=VALUES(polling_rate),
-           switch_type=VALUES(switch_type),
-           switch_durability=VALUES(switch_durability),
-           connectivity=VALUES(connectivity),
-           battery_life=VALUES(battery_life),
-           cable_type=VALUES(cable_type),
-           rgb_lighting=VALUES(rgb_lighting),
-           programmable_buttons=VALUES(programmable_buttons),
-           memory_profiles=VALUES(memory_profiles)""",
-           (product_id, specs.dpi, specs.weight_g, specs.length_mm,
+           """UPDATE technical_specs
+           SET dpi=%s, weight_g=%s, length_mm=%s, width_mm=%s,
+           height_mm=%s, sensor_type=%s, polling_rate=%s,
+           switch_type=%s, switch_durability=%s, connectivity=%s,
+           battery_life=%s, cable_type=%s, rgb_lighting=%s,
+           programmable_buttons=%s, memory_profiles=%s
+           WHERE product_id=%s""",
+           (specs.dpi, specs.weight_g, specs.length_mm,
            specs.width_mm, specs.height_mm, specs.sensor_type,
            specs.polling_rate, specs.switch_type, specs.switch_durability,
            specs.connectivity, specs.battery_life, specs.cable_type,
            specs.rgb_lighting, specs.programmable_buttons,
-           specs.memory_profiles)
+           specs.memory_profiles, product_id)
        )
 
        conn.commit()
 
-       # Get updated product - Make sure to fetch the result
+       # Get updated product
        cursor.execute(
            """SELECT p.*, t.*
            FROM products p
@@ -447,11 +396,12 @@ async def update_product(
            WHERE p.product_id = %s""",
            (product_id,)
        )
-       updated_product = cursor.fetchall()  # Đọc tất cả kết quả
+       updated_product = cursor.fetchone()
+
        if not updated_product:
            raise HTTPException(status_code=404, detail="Updated product not found")
 
-       return updated_product[0]  # Trả về kết quả đầu tiên
+       return updated_product
 
    except Exception as e:
        conn.rollback()
@@ -460,12 +410,5 @@ async def update_product(
            detail=f"Error updating product: {str(e)}"
        )
    finally:
-       # Đảm bảo đọc hết kết quả trước khi đóng cursor
-       while cursor.fetchone(): 
-           pass
-       cursor.close()  
+       cursor.close()
        conn.close()
-       
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)

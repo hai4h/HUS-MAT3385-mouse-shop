@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 04, 2024 at 03:57 PM
+-- Generation Time: Dec 18, 2024 at 02:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -154,6 +154,17 @@ CREATE TABLE `products` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_quantity`, `hand_size`, `grip_style`, `is_wireless`, `brand`, `is_active`, `avg_user_rating`, `avg_expert_rating`, `total_reviews`, `created_at`, `updated_at`) VALUES
+(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 100, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43'),
+(2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 50, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
+(3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 40, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
+(4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 30, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
+(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 79.99, 25, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 09:17:27');
+
 -- --------------------------------------------------------
 
 --
@@ -210,6 +221,17 @@ CREATE TABLE `technical_specs` (
   `programmable_buttons` int(11) DEFAULT NULL,
   `memory_profiles` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `technical_specs`
+--
+
+INSERT INTO `technical_specs` (`spec_id`, `product_id`, `dpi`, `weight_g`, `length_mm`, `width_mm`, `height_mm`, `sensor_type`, `polling_rate`, `switch_type`, `switch_durability`, `connectivity`, `battery_life`, `cable_type`, `rgb_lighting`, `programmable_buttons`, `memory_profiles`) VALUES
+(1, 1, 25600, 80.00, 125.00, 63.50, 40.00, 'HERO 25K', 1000, 'Omron', 50000000, 'LIGHTSPEED Wireless', 70, 'USB-C', 1, 8, '5 onboard profiles'),
+(2, 2, 25600, 63.00, 125.00, 63.50, 40.00, 'HERO 25K', 1000, 'Omron', 50000000, 'LIGHTSPEED Wireless', 70, 'USB-C', 0, 5, '5 onboard profiles'),
+(3, 3, 30000, 63.00, 128.00, 68.00, 44.00, 'Focus Pro 30K', 1000, 'Optical Gen-3', 90000000, 'HyperSpeed Wireless', 90, 'USB-C', 0, 6, '5 onboard profiles'),
+(4, 4, 3200, 73.00, 120.00, 64.00, 40.00, '3360', 1000, 'Huano', 20000000, 'Wired', 0, 'USB-C', 0, 5, 'No onboard memory'),
+(5, 5, 26000, 52.00, 114.00, 58.00, 36.00, 'PAW3395', 1000, 'Kailh 8.0', 80000000, '2.4GHz Wireless', 70, 'USB-C', 1, 6, '4 onboard profiles');
 
 -- --------------------------------------------------------
 
@@ -439,7 +461,7 @@ ALTER TABLE `page_views`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `product_images`
@@ -451,7 +473,7 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT for table `technical_specs`
 --
 ALTER TABLE `technical_specs`
-  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `traffic_analytics`
