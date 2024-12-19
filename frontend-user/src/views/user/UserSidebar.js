@@ -5,22 +5,9 @@ import './UserSidebar.scss';
 
 class UserSidebar extends Component {
   state = {
-    userInfo: null,
-    loading: true,
+    loading: false,
     error: null
   };
-
-  async componentDidMount() {
-    try {
-      const userInfo = await authService.getCurrentUserInfo();
-      this.setState({ userInfo, loading: false });
-    } catch (error) {
-      this.setState({ 
-        error: 'Failed to load user information', 
-        loading: false 
-      });
-    }
-  }
 
   handleAdminRedirect = () => {
     const currentUser = authService.getCurrentUser();
@@ -36,10 +23,9 @@ class UserSidebar extends Component {
   };
 
   render() {
-    const { onClose, onLogout } = this.props;
-    const { userInfo, loading, error } = this.state;
-    const currentUser = authService.getCurrentUser();
-    const isAdmin = currentUser?.role === 'admin';
+    const { onClose, onLogout, user } = this.props;
+    const { loading, error } = this.state;
+    const isAdmin = user?.role === 'admin';
 
     return (
       <div className="user-sidebar">
@@ -57,15 +43,15 @@ class UserSidebar extends Component {
             <>
               <div className="info-item">
                 <label>Username:</label>
-                <span>{userInfo?.username}</span>
+                <span>{user?.username}</span>
               </div>
               <div className="info-item">
                 <label>Email:</label>
-                <span>{userInfo?.email}</span>
+                <span>{user?.email}</span>
               </div>
               <div className="info-item">
                 <label>Họ tên:</label>
-                <span>{userInfo?.full_name}</span>
+                <span>{user?.full_name}</span>
               </div>
               {isAdmin && (
                 <div className="info-item">

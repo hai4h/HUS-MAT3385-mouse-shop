@@ -12,12 +12,15 @@ class ProductPage extends Component {
       loading: true,
       error: null
     };
+    this.hasLoaded = false;
   }
 
-  // Fetch products when component mounts
   async componentDidMount() {
+    if (this.hasLoaded) return;
+    
     try {
       const response = await axiosInstance.get('/products/');
+      this.hasLoaded = true;
       this.setState({
         products: response.data,
         loading: false

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import authService from "../services/authService";
-// import axiosInstance from "../services/axiosConfig";
+import axiosInstance from "../services/axiosConfig";
 
 import "../views/App.scss";
 import "../views/productpage/ProductPage.scss"
@@ -72,7 +72,7 @@ class MyComponent extends Component {
         showSessionExpiredModal: true 
       });
     } else if (currentUser && !authService.isTokenExpired()) {
-      this.setState({ user: currentUser });
+      this.setState({ user: currentUser }); // Chỉ set state từ localStorage
     }
   }
 
@@ -141,8 +141,15 @@ class MyComponent extends Component {
 
   handleLoginSuccess = async (userData) => {
     try {
-      await this.setState({ 
-        user: userData,
+      // Fetch thông tin user đầy đủ sau khi login
+      const userInfoResponse = await axiosInstance.get(`/users/${userData.user_id}`);
+      const fullUserData = {
+        ...userData,
+        ...userInfoResponse.data
+      };
+      
+      this.setState({ 
+        user: fullUserData,
         showLogin: false,
         showSignup: false
       });
@@ -328,7 +335,7 @@ class MyComponent extends Component {
         {user && (
           <div className={`sidebar-container ${showUserSidebar ? 'active' : ''}`}>
             <UserSidebar
-              user={user}
+              user={user}  // Truyền user info đầy đủ xuống
               onClose={this.toggleUserSidebar}
               onLogout={this.handleLogout}
             />
