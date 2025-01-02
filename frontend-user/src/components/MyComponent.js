@@ -35,21 +35,41 @@ class MyComponent extends Component {
     };
   }
 
-  componentDidMount() {
+  loadCompleteUserData = async () => {
+    const currentUser = authService.getCurrentUser();
+    
+    if (currentUser && !authService.isTokenExpired()) {
+        try {
+            const userInfoResponse = await axiosInstance.get(`/users/${currentUser.user_id}`);
+            const fullUserData = {
+                ...currentUser,
+                ...userInfoResponse.data
+            };
+            authService.setUserData(fullUserData);
+            this.setState({ user: fullUserData });
+        } catch (error) {
+            console.error('Error loading complete user data:', error);
+            this.setState({ user: currentUser });
+        }
+    } else if (currentUser && authService.isTokenExpired()) {
+        this.setState({ showSessionExpiredModal: true });
+    }
+  }
+
+  async componentDidMount() {
     document.addEventListener('click', this.handleDocumentClick);
     
-    // Kiểm tra URL params trước
+    // Check URL params first
     const urlParams = new URLSearchParams(window.location.search);
     const isAdminLogout = urlParams.get('adminLogout');
     
     if (isAdminLogout) {
-      // Nếu là redirect từ admin, xóa user data và không hiển thị modal
-      authService.logout();
-      this.setState({ user: null });
-      window.history.replaceState({}, '', window.location.pathname);
+        authService.logout();
+        this.setState({ user: null });
+        window.history.replaceState({}, '', window.location.pathname);
     } else {
-      // Nếu không phải redirect từ admin, kiểm tra token như bình thường
-      this.checkAndUpdateUserAuth();
+        // Load complete user data on mount
+        await this.loadCompleteUserData();
     }
     
     this.setupTokenCheck();

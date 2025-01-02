@@ -47,7 +47,7 @@ class ProductPage extends Component {
     return (
           <div className="product-page">
             <header>
-              <h1>Mice</h1>
+              <h1>Sản phẩm Chuột</h1>
             </header>
           <div className="products">
             <div className="sidebar-filters">
@@ -81,18 +81,18 @@ class ProductPage extends Component {
                 <circle cx="7" cy="3" r="2" stroke="currentColor"></circle>
                 <circle cx="13" cy="11" r="2" stroke="currentColor"></circle>
               </svg>
-                Filters
+                Bộ lọc
               </div>
               <div>
                 <label>
                   <input type="checkbox" />
-                  Filter 1
+                  Tiêu chí 1
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox" />
-                  Filter 2
+                  Tiêu chí 2
                 </label>
               </div>
           </div>
