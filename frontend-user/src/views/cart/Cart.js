@@ -1,6 +1,6 @@
 // src/views/productpage/Cart.js
 import React, { Component } from "react";
-import "./ProductPage";
+import "../productpage/ProductPage";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 class Cart extends Component {
@@ -37,11 +37,15 @@ class Cart extends Component {
                 <span>
                   {item.name} - (x{item.quantity})
                 </span>
-                <button
-                  className="remove-item"
-                  onClick={() => onRemoveToCart(item)}
-                >
-                  Xóa
+                <button className="remove-item" onClick={() => onRemoveToCart(item.cart_item_id)}>
+                  <svg width="30" height="30" viewBox="0 0 12 12">
+                    <path 
+                      d="M3 3L9 9M9 3L3 9" 
+                      stroke="black" 
+                      strokeWidth="1" 
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 </button>
               </li>
             ))}
@@ -57,7 +61,7 @@ class Cart extends Component {
           <div className="cart-summary">
             <div className="subtotal">
               <span>Tổng cộng:</span>
-              <span>{this.calculateTotal().toLocaleString()} VND</span>
+              <span>{this.calculateTotal().toLocaleString()} USD</span>
             </div>
             <button className="checkout-btn">Tiến hành thanh toán</button>
           </div>

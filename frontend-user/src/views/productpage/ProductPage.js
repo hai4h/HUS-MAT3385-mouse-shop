@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../views/App.scss";
 import "./ProductPage.scss";
-import Product from "./Product";
+import "../cart/Cart.scss"
 import axiosInstance from "../../services/axiosConfig";
 
 class ProductPage extends Component {
@@ -98,24 +98,27 @@ class ProductPage extends Component {
           </div>
           
           <div className="products-grid">
-          {products.map((product) => (
-            <div key={product.product_id} className="product-card">
-              <div className="product-name-container">
-                <h3 className="product-name">{product.name}</h3>
+            {products.map((product) => (
+              <div key={product.product_id} className="product-card">
+                <div className="product-name-container">
+                  <h3 className="product-name">{product.name}</h3>
+                </div>
+                <div className="product-image">
+                  {/* Placeholder cho ảnh sản phẩm */}
+                </div>
+                <div className="product-footer">
+                  <p className="product-price">
+                    ${product.price.toLocaleString()}
+                  </p>
+                  <button 
+                    onClick={() => this.props.onAddToCart(product)}
+                    disabled={product.stock_quantity === 0}
+                  >
+                    {product.stock_quantity === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
+                  </button>
+                </div>
               </div>
-              <div className="product-image">
-                {/* Placeholder cho ảnh sản phẩm */}
-              </div>
-              <div className="product-footer">
-                <p className="product-price">
-                  ${product.price.toLocaleString()}
-                </p>
-                <button onClick={() => this.props.onAddToCart(product)}>
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>

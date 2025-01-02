@@ -11,7 +11,8 @@ import LoginForm from "../views/login-signup/LoginForm";
 import SignupForm from "../views/login-signup/SignupForm";
 import SessionExpiredModal from "../views/session/SessionExpiredModal";
 import UserSidebar from "../views/user/UserSidebar";
-import Cart from "../views/productpage/Cart";
+import Cart from "../views/cart/Cart";
+import Toast from "../views/toast/Toast";
 import ProductPage from "../views/productpage/ProductPage";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -22,13 +23,15 @@ class MyComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: null,
       showSearch: false,
       showLogin: false,
       showSignup: false,
       showCart: false,
       showUserSidebar: false,
       cartItems: [],
-      user: null,
+      showToast: false,
+      toastMessage: '',
       searchQuery: "",
       adminLoggedOut: false,
       showSessionExpiredModal: false
@@ -73,12 +76,19 @@ class MyComponent extends Component {
     }
     
     this.setupTokenCheck();
+    this.fetchCart();
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.user === null && this.state.user !== null) {
+      this.fetchCart();
     }
   }
 
@@ -161,7 +171,6 @@ class MyComponent extends Component {
 
   handleLoginSuccess = async (userData) => {
     try {
-      // Fetch thông tin user đầy đủ sau khi login
       const userInfoResponse = await axiosInstance.get(`/users/${userData.user_id}`);
       const fullUserData = {
         ...userData,
@@ -175,6 +184,7 @@ class MyComponent extends Component {
       });
       
       this.setupTokenCheck();
+      await this.fetchCart(); // Fetch giỏ hàng ngay sau khi đăng nhập
     } catch (error) {
       console.error('Error handling login success:', error);
     }
@@ -201,7 +211,12 @@ class MyComponent extends Component {
           clearInterval(this.tokenCheckInterval);
         }
         authService.logout();
-        this.setState({ user: null });
+        this.setState({ 
+          user: null,
+          cartItems: [] // Xóa giỏ hàng
+        }, () => {
+          window.location.reload(); // Reload trang
+        });
       }, 300);
     });
   };
@@ -247,6 +262,76 @@ class MyComponent extends Component {
     }
   };
 
+  addToCart = async (product) => {
+    if (!this.state.user) {
+      this.setState({ showLogin: true });
+      return;
+    }
+
+    try {
+      await axiosInstance.post('/cart/add-to-cart', {
+        product_id: product.product_id,
+        quantity: 1
+      });
+
+      await this.fetchCart();
+      
+      this.setState({
+        showToast: true,
+        toastMessage: 'Sản phẩm đã được thêm vào giỏ hàng'
+      });
+    } catch (error) {
+      if (error.response?.status === 401) {
+        this.setState({ showSessionExpiredModal: true });
+      } else {
+        this.setState({
+          showToast: true,
+          toastMessage: 'Không thể thêm sản phẩm vào giỏ hàng'
+        });
+      }
+    }
+  };
+  
+  removeFromCart = async (cartItemId) => {
+    try {
+      await axiosInstance.delete(`/cart/${cartItemId}`);
+      await this.fetchCart();
+    } catch (error) {
+      if (error.response?.status === 401) {
+        this.setState({ showSessionExpiredModal: true });
+      } else {
+        alert('Không thể xóa sản phẩm khỏi giỏ hàng');
+      }
+    }
+  };
+  
+  fetchCart = async () => {
+    if (!this.state.user) {
+      this.setState({ cartItems: [] });
+      return;
+    }
+  
+    try {
+      const response = await axiosInstance.get('/cart/cart');
+      const cartItems = response.data.items || [];
+      
+      if (JSON.stringify(cartItems) !== JSON.stringify(this.state.cartItems)) {
+        this.setState({ cartItems }, () => {
+          this.forceUpdate(); // Force re-render
+        });
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        this.setState({ showSessionExpiredModal: true });
+      }
+      console.error('Error fetching cart:', error);
+    }
+  };
+
+  hideToast = () => {
+    this.setState({ showToast: false });
+  };
+
   render() {
     const { 
       showSearch, 
@@ -254,7 +339,9 @@ class MyComponent extends Component {
       showSignup, 
       showCart, 
       showUserSidebar, 
-      cartItems, 
+      cartItems,
+      showToast, 
+      toastMessage, 
       user,
       searchQuery,
       showSessionExpiredModal
@@ -262,6 +349,12 @@ class MyComponent extends Component {
 
     return (
       <div className="app">
+        <Toast 
+          message={toastMessage}
+          isVisible={showToast}
+          onHide={this.hideToast}
+        />
+
         {showSessionExpiredModal && (
           <SessionExpiredModal 
             onClose={this.handleSessionExpired}
