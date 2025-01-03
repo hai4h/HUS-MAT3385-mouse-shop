@@ -262,6 +262,14 @@ class MyComponent extends Component {
     }
   };
 
+  handleCartUpdate = (updatedItem) => {
+    const updatedCartItems = this.state.cartItems.map(item =>
+      item.cart_item_id === updatedItem.cart_item_id ? updatedItem : item
+    );
+    
+    this.setState({ cartItems: updatedCartItems });
+  };
+
   addToCart = async (product) => {
     if (!this.state.user) {
       this.setState({ showLogin: true });
@@ -460,6 +468,7 @@ class MyComponent extends Component {
             cartItems={cartItems}
             onClose={this.toggleCart}
             onRemoveToCart={this.removeFromCart}
+            onUpdateCart={this.handleCartUpdate}
           />
         </div>
       </div>

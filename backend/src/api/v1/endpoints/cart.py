@@ -153,3 +153,57 @@ async def remove_from_cart(
     finally:
         cursor.close()
         conn.close()
+
+@router.put("/{cart_item_id}", response_model=CartItem)
+async def update_cart_item(
+    cart_item_id: int,
+    quantity: int,
+    current_user: dict = Depends(get_current_user)
+):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Verify item belongs to user's cart
+        cursor.execute(
+            """SELECT ci.*, p.stock_quantity 
+               FROM cart_items ci
+               JOIN carts c ON ci.cart_id = c.cart_id
+               JOIN products p ON ci.product_id = p.product_id
+               WHERE ci.cart_item_id = %s AND c.user_id = %s""",
+            (cart_item_id, current_user['user_id'])
+        )
+        cart_item = cursor.fetchone()
+        
+        if not cart_item:
+            raise HTTPException(status_code=404, detail="Cart item not found")
+            
+        # Check if requested quantity is valid
+        if quantity <= 0:
+            raise HTTPException(status_code=400, detail="Quantity must be greater than 0")
+            
+        if quantity > cart_item['stock_quantity']:
+            raise HTTPException(status_code=400, detail="Not enough stock available")
+
+        # Update quantity
+        cursor.execute(
+            "UPDATE cart_items SET quantity = %s WHERE cart_item_id = %s",
+            (quantity, cart_item_id)
+        )
+        conn.commit()
+        
+        # Get updated cart item with product details
+        cursor.execute(
+            """SELECT ci.*, p.name, p.price
+               FROM cart_items ci
+               JOIN products p ON ci.product_id = p.product_id
+               WHERE ci.cart_item_id = %s""",
+            (cart_item_id,)
+        )
+        updated_item = cursor.fetchone()
+        
+        return updated_item
+
+    finally:
+        cursor.close()
+        conn.close()

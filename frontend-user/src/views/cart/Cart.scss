@@ -17,163 +17,231 @@
   }
 
   .cart {
-    // Sử dụng flexbox để bố trí các phần tử theo chiều dọc
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px); /* Trừ đi khoảng 50px cho taskbar */
-    max-height: calc(100vh - 40px);
-    padding: 15px;
-    padding-bottom: 30px;
-    position: relative; /* Thêm position relative */
-
-    // Phần tiêu đề giỏ hàng
+    height: 100vh;
+    max-height: 100vh;
+    position: relative;
+  
     .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 15px;
       border-bottom: 1px solid #eee;
-      padding-bottom: 10px;
-
-      // Kiểu chữ và icon giỏ hàng
+  
       h2 {
         display: flex;
         align-items: center;
         gap: 10px;
         margin: 0;
         font-size: 18px;
-      }
-
-      // Nút đóng giỏ hàng
-      .close-cart {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #666;
-        margin-left: auto;
-        position: absolute;
-        right: 10px;
-        top: 10px;
+  
+        .cart-icon {
+          color: #ff0000;
+        }
+  
+        .close-cart {
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          margin-left: auto;
+        }
       }
     }
 
-    // Thông báo khi giỏ hàng trống
     .empty-cart {
-      text-align: center;
-      color: #888;
-      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      opacity: 50%;
     }
-
-    // Danh sách sản phẩm trong giỏ hàng
+  
     .cart-items {
-      flex-grow: 1;
+      flex: 1;
       overflow-y: auto;
       list-style: none;
       padding: 0;
-      margin: 10px 0;
-      max-height: calc(100vh - 250px);
+      margin: 0;
+    }
+  
+    // Main cart item container
+    .cart-item {
+      display: flex;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      gap: 15px;
+      align-items: center;
 
-      // Từng sản phẩm trong giỏ hàng
-      .cart-item {
+      // Product image container
+      .item-image {
+        width: 60px;
+        height: 60px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        flex-shrink: 0;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
+        justify-content: center;
+        
+        img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: cover;
+        }
+      }
 
-        // Nút xóa sản phẩm
-        .remove-item {
-          color: black;
-          background-color: white;
-          border: none;
-          width: 36px;
-          height: 36px;
-          cursor: pointer;
+      // Product details section
+      .item-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 0; // Enables text truncation in flex containers
+
+        // Product name styling
+        .item-name {
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: center; /* Center the text */
+          display: block; /* Ensure the text-align works properly */
+          width: 100%; /* Take full width of container */
+          padding: 0 5px; /* Add small padding for breathing room */
+        }
+
+        // Container for price and quantity controls
+        .price-quantity-container {
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 0;
+          width: 100%;
+          min-width: 0;
+          
+          // Quantity controls section
+          .quantity-controls {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            margin-right: auto; // Creates flexible space between controls and price
+            
+            // Quantity adjustment buttons
+            .quantity-btn {
+              width: 24px;
+              height: 24px;
+              border: 1px solid #ddd;
+              background: white;
+              border-radius: 4px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              
+              &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+              }
+              
+              &:hover:not(:disabled) {
+                background: #f5f5f5;
+              }
+            }
+            
+            // Quantity display
+            .quantity {
+              min-width: 30px;
+              text-align: center;
+              flex-shrink: 0;
+            }
+          }
 
-          &:hover {
-            background-color: #f2f2f2;
-            transition: 300ms;
+          // Price display
+          .item-price {
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 15px; // Minimum spacing from quantity controls
           }
         }
       }
-    }
 
-    // Form nhập mã giảm giá
-    .discount-form {
-      width: 100%;         /* Đảm bảo chiều rộng đúng container */
-      max-width: 100%;     /* Giới hạn chiều rộng tối đa */
-      margin: 0;           /* Reset margin */
-      display: flex;       /* Sử dụng flexbox để căn chỉnh input và button */
-      gap: 0.5rem;          /* Khoảng cách giữa input và button */
-
-      // Ô nhập mã giảm giá
-      input {
-        flex: 1;            /* Input sẽ lấy phần còn lại của space */
-        min-width: 0;       /* Cho phép input co lại khi cần */
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-
-      // Nút áp dụng mã giảm giá
-      button {
-        padding: 0.3rem;
-        background-color: #ff0000;
-        color: white;
+      // Remove item button
+      .remove-item {
+        background: none;
         border: none;
-        border-radius: 4px;
         cursor: pointer;
-        white-space: nowrap; /* Ngăn text trong button bị xuống dòng */
+        color: #666;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
 
         &:hover {
-          background-color: #c50000;
+          color: #ff0000;
         }
       }
     }
-
-    .checkout-form {
-      position: absolute;
-      bottom: 0;
-      width: inherit;         /* Thay đổi từ 100% thành inherit */
-      max-width: 100%; /* Đảm bảo không vượt quá chiều rộng của cart */
-      right: 0;              /* Thêm right: 0 để căn phải */
-      background-color: white;
-      padding: 10px;
-      margin-bottom: 0.5rem;
-
-      // Phần tổng kết giỏ hàng
-      .cart-summary {
-        padding-top: 15px;
-
-        // Tổng tiền
-        .subtotal {
+  
+    .cart-bottom {
+      border-top: 1px solid #eee;
+      background: white;
+      padding: 15px;
+      margin-top: auto;
+  
+      .checkout-form {
+        .discount-form {
           display: flex;
-          justify-content: space-between;
+          gap: 10px;
           margin-bottom: 15px;
-          font-weight: bold;
-        }
-
-        // Nút thanh toán
-        .checkout-btn {
-          width: 100%;
-          padding: 12px;
-          background-color: #353535;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 16px;
-          font-weight: bold;
-
-          &:hover {
-            background-color: #1ba935;
+  
+          input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          }
+  
+          button {
+            padding: 8px 16px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+  
+            &:hover {
+              background: #cc0000;
+            }
           }
         }
-      }    
+  
+        .cart-summary {
+          .subtotal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+          }
+  
+          .checkout-btn {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+  
+            &:hover {
+              background: #1ba935;
+            }
+          }
+        }
+      }
     }
   }
 }
