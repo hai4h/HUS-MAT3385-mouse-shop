@@ -3,7 +3,7 @@ import authService from "../services/authService";
 import axiosInstance from "../services/axiosConfig";
 
 import "../views/App.scss";
-import "../views/productpage/ProductPage.scss"
+import "../views/product-page/ProductPage.scss"
 import "../views/login-signup/LoginSignup.scss"
 import "../views/user/UserSidebar.scss"
 
@@ -13,7 +13,7 @@ import SessionExpiredModal from "../views/session/SessionExpiredModal";
 import UserSidebar from "../views/user/UserSidebar";
 import Cart from "../views/cart/Cart";
 import Toast from "../views/toast/Toast";
-import ProductPage from "../views/productpage/ProductPage";
+import ProductPage from "../views/product-page/ProductPage";
 
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
