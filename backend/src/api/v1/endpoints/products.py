@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import List, Optional
 from src.core.security import get_current_user
-from src.models.schemas.product import Product, ProductCreate
+from src.models.schemas.product import Product, ProductCreate, ProductWithSpecs
 from src.models.schemas.technical_specs import TechnicalSpec
 from src.models.schemas.user import User
 from src.db.database import get_db_connection
@@ -239,25 +239,35 @@ async def list_products(
     
     return products
 
-@router.get("/{product_id}", response_model=Product)
+@router.get("/{product_id}", response_model=ProductWithSpecs)
 async def get_product(product_id: int):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute(
-        """SELECT p.*, t.*
-           FROM products p
-           LEFT JOIN technical_specs t ON p.product_id = t.product_id
-           WHERE p.product_id = %s AND p.is_active = TRUE""",
-        (product_id,)
-    )
-    product = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return product
+    try:
+        cursor.execute(
+            """
+            SELECT 
+                p.*,
+                t.dpi, t.weight_g, t.length_mm, t.width_mm, t.height_mm,
+                t.sensor_type, t.polling_rate, t.switch_type, t.switch_durability,
+                t.connectivity, t.battery_life, t.cable_type, t.rgb_lighting,
+                t.programmable_buttons, t.memory_profiles
+            FROM products p
+            LEFT JOIN technical_specs t ON p.product_id = t.product_id
+            WHERE p.product_id = %s AND p.is_active = TRUE
+            """,
+            (product_id,)
+        )
+        product = cursor.fetchone()
+        
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+            
+        return product
+    finally:
+        cursor.close()
+        conn.close()
 
 @router.put("/{product_id}", response_model=Product)
 async def update_product(

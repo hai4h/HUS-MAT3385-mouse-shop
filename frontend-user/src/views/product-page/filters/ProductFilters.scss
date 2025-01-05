@@ -1,76 +1,76 @@
 .sidebar-filters {
-    width: 15%;
-    min-width: 200px;
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 2vh;
-  
-    .filter-section {
-      margin-top: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #ddd;
-  
-      h3 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: #333;
-      }
-  
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
+  width: 15%;
+  min-width: 200px;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 2vh;
+
+  .filter-section {
+    margin-top: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        margin-right: 8px;
         cursor: pointer;
-  
-        input[type="checkbox"] {
-          margin-right: 8px;
-          cursor: pointer;
-        }
-  
-        .checkbox-text {
-          font-size: 14px;
-          color: #666;
-        }
       }
-  
-      .price-inputs {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-  
-        input {
-          width: 70px;
-          padding: 6px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
-  
-          &:focus {
-            outline: none;
-            border-color: #ff4444;
-          }
-        }
-  
-        span {
-          color: #666;
-        }
+
+      .checkbox-text {
+        font-size: 14px;
+        color: #666;
       }
     }
-  
-    .text-with-icon {
+
+    .price-inputs {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 15px;
-      font-weight: bold;
-      font-size: 16px;
-      color: #333;
-  
-      svg {
-        width: 20px;
-        height: 14px;
+
+      input {
+        width: 70px;
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+
+        &:focus {
+          outline: none;
+          border-color: #ff4444;
+        }
+      }
+
+      span {
+        color: #666;
       }
     }
   }
+
+  .text-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+
+    svg {
+      width: 20px;
+      height: 14px;
+    }
+  }
+}

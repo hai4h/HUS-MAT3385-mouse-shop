@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import "../../views/App.scss";
 import "./ProductPage.scss";
-import "../cart/Cart.scss"
+import "../cart/Cart.scss";
+
 import axiosInstance from "../../services/axiosConfig";
-import ProductFilters from "./filters/ProductFilters"
+import ProductFilters from "./filters/ProductFilters";
+import ProductDetailModal from "./modals/ProductDetailModal";
+
 
 class ProductPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // Existing state properties
       products: [],
       filteredProducts: [],
       loading: true,
@@ -25,10 +27,11 @@ class ProductPage extends Component {
         min: "",
         max: ""
       },
-      // New state properties for unique values
       uniqueBrands: [],
       uniqueHandSizes: [],
-      uniqueGripStyles: []
+      uniqueGripStyles: [],
+      selectedProduct: null,
+      isModalOpen: false
     };
   }
 
@@ -57,6 +60,20 @@ class ProductPage extends Component {
       });
     }
   }
+
+  handleProductClick = (product) => {
+    this.setState({
+      selectedProduct: product,
+      isModalOpen: true
+    });
+  };
+  
+  handleCloseModal = () => {
+    this.setState({
+      isModalOpen: false,
+      selectedProduct: null
+    });
+  };
 
   handleFilterChange = (filterType, value) => {
     this.setState(prevState => {
@@ -149,7 +166,9 @@ class ProductPage extends Component {
       priceRange,
       uniqueBrands,
       uniqueHandSizes,
-      uniqueGripStyles
+      uniqueGripStyles,
+      selectedProduct,  // Add these new state variables
+      isModalOpen 
     } = this.state;
 
     if (loading) {
@@ -179,19 +198,27 @@ class ProductPage extends Component {
           
           <div className="products-grid">
             {filteredProducts.map((product) => (
-              <div key={product.product_id} className="product-card">
+              <div 
+                key={product.product_id} 
+                className="product-card"
+                onClick={() => this.handleProductClick(product)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="product-name-container">
                   <h3 className="product-name">{product.name}</h3>
                 </div>
                 <div className="product-image">
-                  {/* Placeholder cho ảnh sản phẩm */}
+                  {/* Product image placeholder */}
                 </div>
                 <div className="product-footer">
                   <p className="product-price">
                     ${product.price.toLocaleString()}
                   </p>
                   <button 
-                    onClick={() => this.props.onAddToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent modal from opening
+                      this.props.onAddToCart(product);
+                    }}
                     disabled={product.stock_quantity === 0}
                   >
                     {product.stock_quantity === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
@@ -201,6 +228,11 @@ class ProductPage extends Component {
             ))}
           </div>
         </div>
+        <ProductDetailModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={this.handleCloseModal}
+        />
       </div>
     );
   }
