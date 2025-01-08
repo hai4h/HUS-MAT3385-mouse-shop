@@ -7,7 +7,6 @@ import axiosInstance from "../../services/axiosConfig";
 import ProductFilters from "./filters/ProductFilters";
 import ProductDetailModal from "./modals/ProductDetailModal";
 
-
 class ProductPage extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +39,6 @@ class ProductPage extends Component {
       const response = await axiosInstance.get('/products/');
       const products = response.data;
       
-      // Extract unique values using Set and sort them alphabetically
       const uniqueBrands = [...new Set(products.map(p => p.brand))].sort();
       const uniqueHandSizes = [...new Set(products.map(p => p.hand_size))].sort();
       const uniqueGripStyles = [...new Set(products.map(p => p.grip_style))].sort();
@@ -60,6 +58,10 @@ class ProductPage extends Component {
       });
     }
   }
+
+  handleAddToCartFromModal = (productWithQuantity) => {
+    this.props.onAddToCart(productWithQuantity);
+  };
 
   handleProductClick = (product) => {
     this.setState({
@@ -117,32 +119,26 @@ class ProductPage extends Component {
     const { products, filters, priceRange } = this.state;
 
     let filtered = products.filter(product => {
-      // Kiểm tra filter còn hàng
       if (filters.inStock && product.stock_quantity <= 0) {
         return false;
       }
 
-      // Kiểm tra filter kích thước tay
       if (filters.handSize.length > 0 && !filters.handSize.includes(product.hand_size)) {
         return false;
       }
 
-      // Kiểm tra filter kiểu cầm
       if (filters.gripStyle.length > 0 && !filters.gripStyle.includes(product.grip_style)) {
         return false;
       }
 
-      // Kiểm tra filter thương hiệu
       if (filters.brand.length > 0 && !filters.brand.includes(product.brand)) {
         return false;
       }
 
-      // Kiểm tra filter wireless
       if (filters.isWireless && !product.is_wireless) {
         return false;
       }
 
-      // Kiểm tra khoảng giá
       const price = parseFloat(product.price);
       if (priceRange.min && price < parseFloat(priceRange.min)) {
         return false;
@@ -167,7 +163,7 @@ class ProductPage extends Component {
       uniqueBrands,
       uniqueHandSizes,
       uniqueGripStyles,
-      selectedProduct,  // Add these new state variables
+      selectedProduct,
       isModalOpen 
     } = this.state;
 
@@ -216,8 +212,8 @@ class ProductPage extends Component {
                   </p>
                   <button 
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent modal from opening
-                      this.props.onAddToCart(product);
+                      e.stopPropagation();
+                      this.props.onAddToCart({...product, quantity: 1});
                     }}
                     disabled={product.stock_quantity === 0}
                   >
@@ -232,6 +228,7 @@ class ProductPage extends Component {
           product={selectedProduct}
           isOpen={isModalOpen}
           onClose={this.handleCloseModal}
+          onAddToCart={this.handleAddToCartFromModal}
         />
       </div>
     );

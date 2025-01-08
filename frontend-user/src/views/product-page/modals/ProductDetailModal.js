@@ -19,12 +19,13 @@ const ThumbnailPlaceholder = () => (
   </div>
 );
 
-const ProductDetailModal = ({ product, isOpen, onClose }) => {
+const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
   const [isActive, setIsActive] = useState(false);
   const [technicalSpecs, setTechnicalSpecs] = useState(null);
   const [reviews, setReviews] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   const fetchTechnicalSpecs = async () => {
     try {
@@ -32,7 +33,6 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
       setTechnicalSpecs(response.data);
     } catch (error) {
       console.error('Error fetching specs:', error);
-      // Fallback to basic product info
       setTechnicalSpecs(product);
     }
   };
@@ -54,10 +54,9 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 
   const fetchImages = async () => {
     try {
-      const response = await axiosInstance.get(`/products/${product.product_id}/images`);
-      const primaryImage = response.data.find(img => img.is_primary);
-      setProductImages(response.data);
-      setSelectedImage(primaryImage || response.data[0] || null);
+      const response = await axiosInstance.get(`/images/product/${product.product_id}`);
+      setProductImages(response.data.thumbnails || []);
+      setSelectedImage(response.data.primary_image || response.data.thumbnails[0] || null);
     } catch (error) {
       console.error('Error fetching images:', error);
       setProductImages([]);
@@ -70,6 +69,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
       fetchTechnicalSpecs();
       fetchReviews();
       fetchImages();
+      setQuantity(1); // Reset quantity when modal opens
     }
   }, [isOpen, product]);
 
@@ -103,9 +103,14 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
     setSelectedImage(image);
   };
 
+  const handleAddToCart = () => {
+    onAddToCart({ ...product, quantity });
+    setQuantity(1);
+    handleCloseClick();
+  };
+
   const thumbnails = productImages.filter(img => !img.is_primary);
 
-  // Create a display table for specs
   const specsTable = [
     { label: "Hand Size", value: product.hand_size },
     { label: "Grip Style", value: product.grip_style },
@@ -148,7 +153,6 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 
         <div className="modal-body">
           <div className="product-details">
-            {/* Left side - Images */}
             <div className="image-gallery">
               <div className="main-image">
                 {selectedImage ? (
@@ -181,7 +185,6 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Right side - Details */}
             <div className="product-info">
               <h2 className="product-title">{product.name}</h2>
               
@@ -218,7 +221,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                 <h3>Technical Specifications</h3>
                 <div className="specs-grid">
                   {specsTable.map((spec, index) => 
-                    spec.value ? (  // Only render if value exists
+                    spec.value ? (
                       <div key={index} className="spec-item">
                         <span className="spec-label">{spec.label}</span>
                         <span className="spec-value capitalize">{spec.value}</span>
@@ -230,17 +233,13 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 
               <div className="price-section">
                 <div className="price-quantity">
-                  <span className="price">${product.price}</span>
-                  <div className="quantity-controls">
-                    <button>-</button>
-                    <span>1</span>
-                    <button>+</button>
-                  </div>
+                  <span className="price">${(Number(product.price) * quantity).toLocaleString()}</span>
                 </div>
 
                 <button 
                   className="add-to-cart"
                   disabled={product.stock_quantity === 0}
+                  onClick={handleAddToCart}
                 >
                   {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
