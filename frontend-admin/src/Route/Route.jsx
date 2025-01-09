@@ -4,7 +4,7 @@ import Overview from '../app/Dashboard/Overview/Overview';
 import Users from '../app/Dashboard/Users/Users';
 import Product from '../app/Dashboard/Products/Product';
 import Billing from '../app/Dashboard/Billing/Billing';
-import NotFound from '../app/notfound/NotFound';
+import NotFound from '../app/NotFound/NotFound';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 function AppRoute() {

@@ -42,9 +42,10 @@ const Sidebar = ({Children}) => {
     backgroundColor: mode === 'light' 
       ? 'rgba(210, 205, 129, 0.08)' 
       : 'black',
-    color: mode === 'light' ? '#000' : '#fff'
+    color: mode === 'light' ? '#000' : 'orange'  // Changed to orange
   };
-  const iconColor = mode === 'light' ? '#ff0505' : "#fff";
+  
+  const iconColor = mode === 'light' ? '#ff0505' : "orange";  // Changed to orange
 
   return(
     <div className={`container ${isCollapsed ? "collapsed" : ""}`}>
@@ -64,7 +65,8 @@ const Sidebar = ({Children}) => {
               style={{
                 color: selected === index 
                   ? '#ff0505' 
-                  : (mode === 'light' ? '#000' : '#fff')
+                  : (mode === 'light' ? '#000' : 'orange'),
+                  textDecoration: 'none'
               }}
             >
               <div 
