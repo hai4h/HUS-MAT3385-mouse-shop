@@ -162,3 +162,4 @@ cython_debug/
 /frontend-user/node_modules
 frontend-user/package-lock.json
 frontend-user/package-lock.json
+/frontend-admin/node_modules
