@@ -7,10 +7,11 @@ const ProductFilters = ({
   priceRange,
   onPriceChange,
   handleStockFilter,
-  // New props for dynamic filter options
   brands,
   handSizes,
-  gripStyles
+  gripStyles,
+  userPreferences,
+  onPreferenceFilterChange
 }) => {
   return (
     <div className="sidebar-filters">
@@ -47,6 +48,47 @@ const ProductFilters = ({
         Bộ lọc
       </div>
 
+      {/* Preference-based filter section - Only show if user has preferences */}
+      {userPreferences && Object.keys(userPreferences).length > 0 && (
+        <div className="filter-section">
+          <h3>Gợi ý cho bạn</h3>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={filters.usePreferences}
+              onChange={() => onPreferenceFilterChange()}
+            />
+            <span className="checkbox-text">Sản phẩm phù hợp với bạn</span>
+          </label>
+          {filters.usePreferences && (
+            <div className="preferences-summary">
+              <div className="preference-item">
+                <span className="label">Cỡ tay:</span>
+                <span className="value">
+                  {userPreferences.hand_size === 'small' ? 'Nhỏ' :
+                   userPreferences.hand_size === 'medium' ? 'Trung bình' :
+                   userPreferences.hand_size === 'large' ? 'Lớn' : ''}
+                </span>
+              </div>
+              <div className="preference-item">
+                <span className="label">Kiểu cầm:</span>
+                <span className="value">
+                  {userPreferences.grip_style === 'palm' ? 'Palm' :
+                   userPreferences.grip_style === 'claw' ? 'Claw' :
+                   userPreferences.grip_style === 'fingertip' ? 'Fingertip' : ''}
+                </span>
+              </div>
+              <div className="preference-item">
+                <span className="label">Kết nối:</span>
+                <span className="value">
+                  {userPreferences.wireless_preferred ? 'Không dây' : 'Có dây'}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stock Filter */}
       <div className="filter-section">
         <h3>Tình trạng</h3>
@@ -82,7 +124,7 @@ const ProductFilters = ({
         </div>
       </div>
 
-      {/* Hand Size Filter - Now using dynamic values */}
+      {/* Hand Size Filter */}
       <div className="filter-section">
         <h3>Kích thước tay</h3>
         {handSizes.map((size) => (
@@ -93,13 +135,15 @@ const ProductFilters = ({
               onChange={() => onFilterChange('handSize', size)}
             />
             <span className="checkbox-text">
-              {size.charAt(0).toUpperCase() + size.slice(1)}
+              {size === 'small' ? 'Nhỏ' :
+               size === 'medium' ? 'Trung bình' :
+               size === 'large' ? 'Lớn' : size}
             </span>
           </label>
         ))}
       </div>
 
-      {/* Grip Style Filter - Now using dynamic values */}
+      {/* Grip Style Filter */}
       <div className="filter-section">
         <h3>Kiểu cầm</h3>
         {gripStyles.map((style) => (
@@ -110,13 +154,15 @@ const ProductFilters = ({
               onChange={() => onFilterChange('gripStyle', style)}
             />
             <span className="checkbox-text">
-              {style.charAt(0).toUpperCase() + style.slice(1)}
+              {style === 'palm' ? 'Palm Grip' :
+               style === 'claw' ? 'Claw Grip' :
+               style === 'fingertip' ? 'Fingertip Grip' : style}
             </span>
           </label>
         ))}
       </div>
 
-      {/* Brand Filter - Now using dynamic values */}
+      {/* Brand Filter */}
       <div className="filter-section">
         <h3>Thương hiệu</h3>
         {brands.map((brand) => (
@@ -140,7 +186,7 @@ const ProductFilters = ({
             checked={filters.isWireless}
             onChange={() => onFilterChange('isWireless')}
           />
-          <span className="checkbox-text">Wireless</span>
+          <span className="checkbox-text">Không dây</span>
         </label>
       </div>
     </div>

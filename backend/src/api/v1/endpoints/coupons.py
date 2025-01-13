@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from src.core.security import get_current_user
 from src.db.database import get_db_connection
-from src.models.schemas.coupon import CouponCreate, CouponUpdate, Coupon
+from src.models.schemas.coupon import CouponCreate, CouponUpdate, Coupon, CouponRestriction
 
 router = APIRouter()
 
@@ -119,3 +119,36 @@ async def verify_coupon(
         conn.close()
 
 # Add other coupon endpoints
+@router.get("/coupon_category_restrictions/{coupon_id}")
+async def get_coupon_restrictions(
+    coupon_id: int,
+    current_user: dict = Depends(get_current_user)
+):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Verify coupon exists
+        cursor.execute(
+            "SELECT coupon_id FROM coupons WHERE coupon_id = %s",
+            (coupon_id,)
+        )
+        if not cursor.fetchone():
+            raise HTTPException(
+                status_code=404, 
+                detail="Coupon not found"
+            )
+
+        # Get restrictions
+        cursor.execute("""
+            SELECT restriction_id, coupon_id, category, category_value
+            FROM coupon_category_restrictions
+            WHERE coupon_id = %s
+        """, (coupon_id,))
+        
+        restrictions = cursor.fetchall()
+        return restrictions
+
+    finally:
+        cursor.close()
+        conn.close()

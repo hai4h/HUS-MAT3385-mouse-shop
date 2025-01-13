@@ -1,5 +1,5 @@
-// UserSidebar.js
 import React, { Component } from 'react';
+import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 import './UserSidebar.scss';
 
@@ -22,6 +22,11 @@ class UserSidebar extends Component {
     }
   };
 
+  handleAccountRedirect = () => {
+    this.props.onClose(); // Close the sidebar first
+    window.location.href = '/account';
+  };
+
   render() {
     const { onClose, onLogout, user } = this.props;
     const { loading, error } = this.state;
@@ -41,24 +46,39 @@ class UserSidebar extends Component {
             <div className="error">{error}</div>
           ) : (
             <>
-              <div className="info-item">
-                <label>Username:</label>
-                <span>{user?.username}</span>
-              </div>
-              <div className="info-item">
-                <label>Email:</label>
-                <span>{user?.email}</span>
-              </div>
-              <div className="info-item">
-                <label>Họ tên:</label>
-                <span>{user?.full_name}</span>
-              </div>
-              {isAdmin && (
+              <div className="info-section">
+                <h3>Thông tin cơ bản</h3>
                 <div className="info-item">
-                  <label>Role:</label>
-                  <span>Administrator</span>
+                  <label>Username:</label>
+                  <span>{user?.username}</span>
                 </div>
-              )}
+                <div className="info-item">
+                  <label>Email:</label>
+                  <span>{user?.email}</span>
+                </div>
+                <div className="info-item">
+                  <label>Họ tên:</label>
+                  <span>{user?.full_name}</span>
+                </div>
+                {isAdmin && (
+                  <div className="info-item">
+                    <label>Role:</label>
+                    <span>Administrator</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="info-section">
+                <h3>Thông tin liên hệ</h3>
+                <div className="info-item">
+                  <label>Số điện thoại:</label>
+                  <span>{user?.phone || 'Chưa cập nhật'}</span>
+                </div>
+                <div className="info-item">
+                  <label>Địa chỉ:</label>
+                  <span>{user?.address || 'Chưa cập nhật'}</span>
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -72,6 +92,12 @@ class UserSidebar extends Component {
               Trang Quản trị
             </button>
           )}
+          <button 
+            className="account-button"
+            onClick={this.handleAccountRedirect}
+          >
+            Quản lý tài khoản
+          </button>
           <button className="logout-button" onClick={onLogout}>
             Đăng xuất
           </button>

@@ -17,17 +17,13 @@ const theme = createTheme({
     dark: {
       palette: {
         custom: {
-          cardBorderColor: 'orange',
-          cardIconColor: 'orange',
+          cardBorderColor: 'white',
+          cardIconColor: 'white', 
           tableHeaderBg: 'white',
-          tableHeaderText: 'orange',
+          tableHeaderText: 'black',
           openInNewIcon: 'white',
-          colorIcon: 'orange'
+          colorIcon : 'lightblue'
         }
-      },
-      text: {
-        primary: 'orange',
-        secondary: 'orange'
       }
     }
   }

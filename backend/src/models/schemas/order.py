@@ -10,6 +10,8 @@ class OrderItemCreate(BaseModel):
 class OrderCreate(BaseModel):
     items: List[OrderItemCreate]
     shipping_address: str = Field(..., min_length=10)
+    note: Optional[str] = None
+    coupon_id: Optional[int] = None
     
 class OrderItemResponse(OrderItemCreate):
     unit_price: Decimal

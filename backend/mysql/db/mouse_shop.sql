@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 09, 2025 at 06:44 PM
+-- Generation Time: Jan 13, 2025 at 12:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -71,13 +71,6 @@ CREATE TABLE `cart_items` (
   `added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `cart_items`
---
-
-INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
-(22, 1, 1, 1, '2025-01-08 17:00:47');
-
 -- --------------------------------------------------------
 
 --
@@ -108,7 +101,7 @@ CREATE TABLE `coupons` (
 --
 
 INSERT INTO `coupons` (`coupon_id`, `code`, `name`, `description`, `discount_type`, `discount_value`, `min_order_value`, `max_discount_amount`, `start_date`, `end_date`, `total_usage_limit`, `user_usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04');
+(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 1, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04');
 
 -- --------------------------------------------------------
 
@@ -144,6 +137,13 @@ CREATE TABLE `coupon_usage_history` (
   `used_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `discount_amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `coupon_usage_history`
+--
+
+INSERT INTO `coupon_usage_history` (`usage_id`, `coupon_id`, `user_id`, `order_id`, `used_at`, `discount_amount`) VALUES
+(1, 1, 2, 2, '2025-01-12 11:56:07', 12.00);
 
 -- --------------------------------------------------------
 
@@ -182,6 +182,7 @@ CREATE TABLE `orders` (
   `total_amount` decimal(10,2) NOT NULL,
   `status` varchar(20) DEFAULT NULL CHECK (`status` in ('pending','processing','shipped','delivered','cancelled')),
   `shipping_address` text NOT NULL,
+  `note` text DEFAULT NULL,
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `promotion_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -194,8 +195,9 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `shipping_address`, `order_date`, `updated_at`, `promotion_id`, `discount_amount`, `coupon_id`, `coupon_discount`) VALUES
-(1, 1, 129.99, 'pending', '123 Main St, City, Country, 12345', '2025-01-05 16:04:34', '2025-01-05 16:04:34', NULL, 0.00, NULL, 0.00);
+INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `shipping_address`, `note`, `order_date`, `updated_at`, `promotion_id`, `discount_amount`, `coupon_id`, `coupon_discount`) VALUES
+(1, 1, 129.99, 'pending', '123 Main St, City, Country, 12345', NULL, '2025-01-05 09:04:34', '2025-01-05 09:04:34', NULL, 0.00, NULL, 0.00),
+(2, 2, 107.99, 'pending', 'Test User, 0123456789, So 7, Thien Quang', 'tét', '2025-01-12 11:56:07', '2025-01-12 11:56:07', 1, 30.00, 1, 12.00);
 
 -- --------------------------------------------------------
 
@@ -217,7 +219,8 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `subtotal`) VALUES
-(1, 1, 1, 1, 129.99, 129.99);
+(1, 1, 1, 1, 129.99, 129.99),
+(2, 2, 2, 1, 149.99, 149.99);
 
 -- --------------------------------------------------------
 
@@ -265,11 +268,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_quantity`, `hand_size`, `grip_style`, `is_wireless`, `brand`, `is_active`, `avg_user_rating`, `avg_expert_rating`, `total_reviews`, `created_at`, `updated_at`) VALUES
-(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 99, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43'),
-(2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 50, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
-(3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 40, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
-(4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 30, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
-(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 25, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15');
+(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 96, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43'),
+(2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 46, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
+(3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 39, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
+(4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 28, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
+(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15');
 
 -- --------------------------------------------------------
 
@@ -335,7 +338,7 @@ CREATE TABLE `promotions` (
 --
 
 INSERT INTO `promotions` (`promotion_id`, `name`, `description`, `discount_type`, `discount_value`, `start_date`, `end_date`, `min_order_value`, `max_discount_amount`, `usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 20.00, '2025-06-01 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 0, 1, '2025-01-09 17:05:55', '2025-01-09 17:05:55');
+(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 20.00, '2024-12-31 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 1, 1, '2025-01-09 17:05:55', '2025-01-09 17:05:55');
 
 -- --------------------------------------------------------
 
@@ -433,7 +436,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `address`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'admintest', 'admin@example.com', '$2b$12$.4tn.sVnaxkxlxMhpXaURuVE0gBta5Z/aE7S7GIcDU0s19.cgZaLm', 'Hoang Dinh Hai Anh', NULL, NULL, 'admin', '2024-12-04 03:38:09', '2024-12-04 03:38:09'),
-(2, 'testuser1', 'testuser1@example.com', '$2b$12$tyR4pcU1IA9Q3WWJAd94wOSJlmQ4ARWArGnWbG3X7RoRY8n9ZJOvq', 'Test User', NULL, NULL, 'user', '2024-12-04 05:01:46', '2024-12-04 05:01:46');
+(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 11:48:56');
 
 -- --------------------------------------------------------
 
@@ -450,6 +453,13 @@ CREATE TABLE `user_preferences` (
   `usage_type` varchar(20) DEFAULT NULL CHECK (`usage_type` in ('gaming','office','general')),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_preferences`
+--
+
+INSERT INTO `user_preferences` (`preference_id`, `user_id`, `hand_size`, `grip_style`, `wireless_preferred`, `usage_type`, `updated_at`) VALUES
+(1, 2, 'medium', 'claw', 1, 'gaming', '2025-01-13 11:48:56');
 
 -- --------------------------------------------------------
 
@@ -471,7 +481,7 @@ CREATE TABLE `user_reviews` (
 --
 
 INSERT INTO `user_reviews` (`review_id`, `order_detail_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'dm logitech', '2025-01-05 16:05:18', '2025-01-05 16:05:18');
+(1, 1, 1, 'dm logitech', '2025-01-05 09:05:18', '2025-01-05 09:05:18');
 
 -- --------------------------------------------------------
 
@@ -688,7 +698,7 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `coupons`
@@ -706,7 +716,7 @@ ALTER TABLE `coupon_category_restrictions`
 -- AUTO_INCREMENT for table `coupon_usage_history`
 --
 ALTER TABLE `coupon_usage_history`
-  MODIFY `usage_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `usage_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `expert_reviews`
@@ -718,13 +728,13 @@ ALTER TABLE `expert_reviews`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `page_views`
@@ -778,7 +788,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_preferences`
 --
 ALTER TABLE `user_preferences`
-  MODIFY `preference_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `preference_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `user_reviews`

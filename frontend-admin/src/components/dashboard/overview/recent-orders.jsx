@@ -33,25 +33,22 @@ export function RecentOrders({ orders = [], sx }) {
       <Divider />
       <Box sx={{ overflowX: "auto" }}>
         <Table sx={{ minWidth: 800 }}>
-        <TableHead>
-          <TableRow
-            sx={{
-              backgroundColor: '#FFA500', // Orange background for header row
-              '& > th': { 
-                color: 'black', // White text for all header cells
-                fontWeight: 'bold'
-              },
-            }}
-          >
-            <TableCell align="center" sx={{fontSize:'16px'}} ></TableCell>
-            <TableCell align="center" sx={{fontSize:'16px'}} >Product</TableCell>
-            <TableCell align="center" sortDirection="desc" sx={{fontSize:'16px'}}>Date</TableCell>
-            <TableCell align="center" sx={{fontSize:'16px'}}>Order</TableCell>
-            <TableCell align="center" sx={{fontSize:'16px'}}>Status</TableCell>
-            <TableCell align="center" sx={{fontSize:'16px'}}>Amount</TableCell>
-            <TableCell align="center" sx={{fontSize:'16px'}}></TableCell>
-          </TableRow>
-        </TableHead>
+          <TableHead>
+            <TableRow
+              sx={{
+                backgroundColor: bg, 
+                '& > th': { color: text },
+              }}
+            >
+              <TableCell align="center" ></TableCell>
+              <TableCell align="center" sx={{fontSize:'16px' }}>Product</TableCell>
+              <TableCell align="center" sortDirection="desc" sx={{fontSize:'16px'}}>Date</TableCell>
+              <TableCell align="center" sx={{fontSize:'16px'}}>Order</TableCell>
+              <TableCell align="center" sx={{fontSize:'16px'}}>Status</TableCell>
+              <TableCell align="center" sx={{fontSize:'16px'}}>Amount</TableCell>
+              <TableCell align="center" sx={{fontSize:'16px'}}></TableCell>
+             </TableRow>
+          </TableHead>
           <TableBody>
             {orders.map((order) => {
               const { label, color } = statusMap[order.status] ?? {

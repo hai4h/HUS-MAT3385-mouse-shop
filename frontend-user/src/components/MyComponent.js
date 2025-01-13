@@ -14,6 +14,8 @@ import UserSidebar from "../views/user/UserSidebar";
 import Cart from "../views/cart/Cart";
 import Toast from "../views/toast/Toast";
 import ProductPage from "../views/product-page/ProductPage";
+import SearchResults from "../views/product-page/search/SearchResults";
+import ProductDetailModal from "../views/product-page/modals/ProductDetailModal";
 
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -34,28 +36,60 @@ class MyComponent extends Component {
       toastMessage: '',
       searchQuery: "",
       adminLoggedOut: false,
-      showSessionExpiredModal: false
+      showSessionExpiredModal: false,
+      products: [],
+      selectedProduct: null,
+      isModalOpen: false,
     };
+    this.productPageRef = React.createRef();
+    this.handleSessionExpired = this.handleSessionExpired.bind(this);
   }
 
   loadCompleteUserData = async () => {
     const currentUser = authService.getCurrentUser();
     
-    if (currentUser && !authService.isTokenExpired()) {
-        try {
-            const userInfoResponse = await axiosInstance.get(`/users/${currentUser.user_id}`);
-            const fullUserData = {
-                ...currentUser,
-                ...userInfoResponse.data
-            };
-            authService.setUserData(fullUserData);
-            this.setState({ user: fullUserData });
-        } catch (error) {
-            console.error('Error loading complete user data:', error);
-            this.setState({ user: currentUser });
+    if (currentUser) {
+      if (authService.isTokenExpired()) {
+        // Clear các state liên quan
+        this.setState({ 
+          user: null,
+          cartItems: [],
+          showSessionExpiredModal: true,
+          showCart: false,
+          showUserSidebar: false
+        });
+        // Clear interval nếu có
+        if (this.tokenCheckInterval) {
+          clearInterval(this.tokenCheckInterval);
         }
-    } else if (currentUser && authService.isTokenExpired()) {
-        this.setState({ showSessionExpiredModal: true });
+        return;
+      }
+  
+      try {
+        const userInfoResponse = await axiosInstance.get(`/users/${currentUser.user_id}`);
+        const fullUserData = {
+          ...currentUser,
+          ...userInfoResponse.data
+        };
+        authService.setUserData(fullUserData);
+        this.setState({ user: fullUserData });
+      } catch (error) {
+        if (error.response?.status === 401) {
+          this.setState({ 
+            user: null,
+            cartItems: [],
+            showSessionExpiredModal: true,
+            showCart: false,
+            showUserSidebar: false
+          });
+          if (this.tokenCheckInterval) {
+            clearInterval(this.tokenCheckInterval);
+          }
+        } else {
+          console.error('Error loading complete user data:', error);
+          this.setState({ user: currentUser });
+        }
+      }
     }
   }
 
@@ -67,23 +101,36 @@ class MyComponent extends Component {
     const isAdminLogout = urlParams.get('adminLogout');
     
     if (isAdminLogout) {
-        authService.logout();
-        this.setState({ user: null });
-        window.history.replaceState({}, '', window.location.pathname);
+      authService.logout();
+      this.setState({ user: null });
+      window.history.replaceState({}, '', window.location.pathname);
     } else {
-        // Load complete user data on mount
-        await this.loadCompleteUserData();
+      // Load initial data and setup checks
+      this.loadCompleteUserData().then(() => {
+        if (this.state.user && !this.state.showSessionExpiredModal) {
+          this.setupTokenCheck();
+        }
+      });
     }
-    
-    this.setupTokenCheck();
+
+    try {
+      const response = await axiosInstance.get('/products/');
+      this.setState({ products: response.data });
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  
     this.fetchCart();
+    window.addEventListener('sessionExpired', this.handleSessionExpired);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.handleDocumentClick);
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
+    window.removeEventListener('focus', this.checkAndUpdateUserAuth);
+    window.removeEventListener('sessionExpired', this.handleSessionExpired);
+    document.removeEventListener('click', this.handleDocumentClick);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -92,36 +139,65 @@ class MyComponent extends Component {
     }
   }
 
+  
   checkAndUpdateUserAuth = () => {
+    console.log('Checking auth status...'); // Debug log
     const currentUser = authService.getCurrentUser();
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAdminLogout = urlParams.get('adminLogout');
-    
-    if (currentUser && authService.isTokenExpired() && !isAdminLogout) {
-      this.setState({ 
-        showSessionExpiredModal: true 
+    if (!currentUser) return;
+
+    if (authService.isTokenExpired()) {
+      console.log('Token expired, attempting to show modal...'); // Debug log
+      
+      // Clear interval
+      if (this.tokenCheckInterval) {
+        clearInterval(this.tokenCheckInterval);
+        this.tokenCheckInterval = null;
+      }
+      
+      // Force a state update to show modal
+      this.setState(prevState => {
+        console.log('Previous state showSessionExpiredModal:', prevState.showSessionExpiredModal);
+        return {
+          showSessionExpiredModal: true,
+          showCart: false,
+          showUserSidebar: false,
+          showLogin: false,
+          showSignup: false
+        };
+      }, () => {
+        console.log('State updated, showSessionExpiredModal:', this.state.showSessionExpiredModal);
       });
-    } else if (currentUser && !authService.isTokenExpired()) {
-      this.setState({ user: currentUser }); // Chỉ set state từ localStorage
     }
-  }
+  };
 
   setupTokenCheck = () => {
-    // Clear interval cũ nếu có
+    console.log('Setting up token check...'); // Debug log
+    // Clear existing interval if any
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
     
-    // Thiết lập interval mới (30 giây)
+    // Initial check
+    this.checkAndUpdateUserAuth();
+    
+    // Set up interval check (every 30 seconds)
     this.tokenCheckInterval = setInterval(() => {
+      console.log('Interval check triggered'); // Debug log
       this.checkAndUpdateUserAuth();
-    }, 30000);
+    }, 30000); // Reduced to 30 seconds for testing
+    
+    // Add window focus listener
+    window.addEventListener('focus', () => {
+      console.log('Window focused, checking auth...'); // Debug log
+      this.checkAndUpdateUserAuth();
+    });
   };
 
   toggleSearch = (event) => {
     event.stopPropagation();
     this.setState(prevState => ({
       showSearch: !prevState.showSearch,
+      searchQuery: '', // Reset search query when toggling
       showLogin: false,
       showSignup: false,
       showCart: false,
@@ -184,7 +260,12 @@ class MyComponent extends Component {
       });
       
       this.setupTokenCheck();
-      await this.fetchCart(); // Fetch giỏ hàng ngay sau khi đăng nhập
+      await this.fetchCart();
+      
+      // Thêm dòng này để fetch lại preferences
+      if (this.productPageRef.current) {
+        this.productPageRef.current.fetchUserPreferences();
+      }
     } catch (error) {
       console.error('Error handling login success:', error);
     }
@@ -222,14 +303,57 @@ class MyComponent extends Component {
   };
 
   handleSessionExpired = () => {
-    // Xóa dữ liệu user và reload trang
-    authService.logout();
+    console.log('Session expired event triggered'); // Debug log
+    if (this.tokenCheckInterval) {
+      clearInterval(this.tokenCheckInterval);
+    }
     this.setState({ 
       user: null,
-      showSessionExpiredModal: false 
+      cartItems: [],
+      showSessionExpiredModal: true,
+      showCart: false,
+      showUserSidebar: false
+    });
+  };
+  
+  handleModalConfirm = () => {
+    console.log('Modal confirm clicked'); // Debug log
+    
+    // Clear all intervals
+    if (this.tokenCheckInterval) {
+      clearInterval(this.tokenCheckInterval);
+      this.tokenCheckInterval = null;
+    }
+    
+    // First hide modal and clear states
+    this.setState({
+      showSessionExpiredModal: false,
+      user: null,
+      cartItems: [],
+      showCart: false,
+      showUserSidebar: false,
+      showLogin: false,
+      showSignup: false
     }, () => {
+      console.log('States cleared'); // Debug log
+      
+      // Then logout
+      authService.logout();
+      
+      // Finally reload the page
       window.location.reload();
     });
+  };
+
+  handleAPIError = (error) => {
+    if (error.response?.status === 401) {
+      // Only show modal, don't reload
+      this.setState({ 
+        showSessionExpiredModal: true 
+      });
+      return true; // Indicate that error was handled
+    }
+    return false; // Error wasn't handled
   };
 
   handleDocumentClick = (event) => {
@@ -243,7 +367,10 @@ class MyComponent extends Component {
     const authIcon = event.target.closest('.icon.login');
     
     if (!searchContainer && !searchIcon && this.state.showSearch) {
-      this.setState({ showSearch: false });
+      this.setState({ 
+        showSearch: false,
+        searchQuery: ''
+      });
     }
 
     if (!cartContainer && !cartIcon && this.state.showCart) {
@@ -275,13 +402,13 @@ class MyComponent extends Component {
       this.setState({ showLogin: true });
       return;
     }
-
+  
     try {
       await axiosInstance.post('/cart/add-to-cart', {
         product_id: product.product_id,
         quantity: 1
       });
-
+  
       await this.fetchCart();
       
       this.setState({
@@ -289,9 +416,7 @@ class MyComponent extends Component {
         toastMessage: 'Sản phẩm đã được thêm vào giỏ hàng'
       });
     } catch (error) {
-      if (error.response?.status === 401) {
-        this.setState({ showSessionExpiredModal: true });
-      } else {
+      if (!this.handleAPIError(error)) {
         this.setState({
           showToast: true,
           toastMessage: 'Không thể thêm sản phẩm vào giỏ hàng'
@@ -324,15 +449,12 @@ class MyComponent extends Component {
       const cartItems = response.data.items || [];
       
       if (JSON.stringify(cartItems) !== JSON.stringify(this.state.cartItems)) {
-        this.setState({ cartItems }, () => {
-          this.forceUpdate(); // Force re-render
-        });
+        this.setState({ cartItems });
       }
     } catch (error) {
-      if (error.response?.status === 401) {
-        this.setState({ showSessionExpiredModal: true });
+      if (!this.handleAPIError(error)) {
+        console.error('Error fetching cart:', error);
       }
-      console.error('Error fetching cart:', error);
     }
   };
 
@@ -352,8 +474,13 @@ class MyComponent extends Component {
       toastMessage, 
       user,
       searchQuery,
-      showSessionExpiredModal
+      showSessionExpiredModal,
+      products, // Thêm products
+      selectedProduct, // Thêm selectedProduct  
+      isModalOpen // Thêm isModalOpen
     } = this.state;
+
+    console.log('Rendering MyComponent, showSessionExpiredModal:', showSessionExpiredModal);
 
     return (
       <div className="app">
@@ -363,28 +490,41 @@ class MyComponent extends Component {
           onHide={this.hideToast}
         />
 
-        {showSessionExpiredModal && (
-          <SessionExpiredModal 
-            onClose={this.handleSessionExpired}
-          />
-        )}
+      {console.log('Modal state:', showSessionExpiredModal)}
 
         <div className={`overlay ${(showLogin || showSignup || showCart || showUserSidebar) ? 'active' : ''}`} />
 
         <header className="header">
           <div className="logo">X</div>
-          
-          <div className={`search-input-container ${!showSearch ? 'hidden' : ''}`}>
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..."
-              value={searchQuery}
-              onChange={(e) => this.setState({ searchQuery: e.target.value })}
-              autoFocus={showSearch}
-            />
-          </div>
 
           <div className="header-icons">
+            <div className={`search-input-container ${!showSearch ? 'hidden' : ''}`}>
+              <input 
+                type="text" 
+                placeholder="Tìm kiếm..."
+                value={searchQuery}
+                onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                autoFocus={showSearch}
+              />
+              <SearchResults
+                products={products} // Sử dụng products từ state
+                searchQuery={searchQuery}
+                onSelectProduct={(product) => {
+                  this.setState({
+                    selectedProduct: product,
+                    isModalOpen: true,
+                    searchQuery: '',
+                    showSearch: false
+                  });
+                }}
+                onCloseSearch={() => this.setState({ 
+                  showSearch: false,
+                  searchQuery: ''
+                })}
+                isVisible={showSearch}
+              />
+            </div>
+
             <span className="icon search" onClick={this.toggleSearch}>
               <SearchIcon style={{ color: "red" }} />
             </span>
@@ -408,7 +548,10 @@ class MyComponent extends Component {
           </div>
         </header>
 
-        <ProductPage onAddToCart={this.addToCart} />
+        <ProductPage 
+          onAddToCart={this.addToCart} 
+          ref={this.productPageRef} // Thêm dòng này
+        />
 
         <div className={`login-signup-sidebar ${showLogin || showSignup ? 'active' : ''}`}>
           <div className="form-toggle">
@@ -469,8 +612,24 @@ class MyComponent extends Component {
             onClose={this.toggleCart}
             onRemoveToCart={this.removeFromCart}
             onUpdateCart={this.handleCartUpdate}
+            user={this.state.user}
+            onFetchCart={this.fetchCart}  // Thêm dòng này
           />
         </div>
+
+        {showSessionExpiredModal && (
+          <SessionExpiredModal onClose={this.handleModalConfirm} />
+        )}
+
+        <ProductDetailModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={() => this.setState({ 
+            isModalOpen: false,
+            selectedProduct: null 
+          })}
+          onAddToCart={this.addToCart} // Use this.addToCart instead of this.props.onAddToCart
+        />
       </div>
     );
   }

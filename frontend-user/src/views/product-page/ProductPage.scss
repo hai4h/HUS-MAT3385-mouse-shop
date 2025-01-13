@@ -6,36 +6,6 @@
   background-color: white;
   padding: 10px 20px;
   border-bottom: 1px solid #ddd;
-  .search-input-container {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    transition: all 0.3s ease;
-
-    input {
-      width: 300px;
-      height: 35px;
-      padding: 0 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-right: 5px;
-      opacity: 1;
-      transition: all 0.3s ease;
-
-      &:focus {
-        outline: none; // Loại bỏ outline mặc định
-        border-color: #ff0000; // Đổi màu viền thành đỏ khi focus
-      }
-    }
-
-    &.hidden {
-      input {
-        width: 0;
-        padding: 0;
-        opacity: 0;
-      }
-    }
-  }
 }
 
 
@@ -102,8 +72,8 @@
 
 .products {
   display: flex;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 3vh;
+  margin-top: 2vh;
   min-height: 100vh;
 
   .products-grid {
@@ -112,8 +82,7 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));  // Tạo columns linh hoạt
     gap: 5vh;  // Khoảng cách giữa các card
     align-items: flex-start;  // Quan trọng: Căn các items về phía trên thay vì stretch
-    padding-top: 2vh;
-    padding-bottom: 4vh;
+    padding: 2vh;
 
     .product-card {
       width: 25vh;  // Chiều rộng cố định theo viewport height
@@ -123,7 +92,6 @@
       padding: 2vh;
       display: flex;
       flex-direction: column;
-      gap: 2vh;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
       opacity: 0;
@@ -252,7 +220,8 @@
   padding: 20px;
   font-size: 18px;
   width: 100%;
-  // animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse 1.5s ease-in-out infinite;
+  color: #7a7a7a;
 }
 
 .error {

@@ -28,3 +28,9 @@ class Coupon(CouponBase):
     used_count: int
     created_at: datetime
     updated_at: datetime
+
+class CouponRestriction(BaseModel):
+    restriction_id: int
+    coupon_id: int
+    category: str
+    category_value: str

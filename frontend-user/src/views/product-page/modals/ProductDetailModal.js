@@ -43,11 +43,11 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
       setReviews(response.data);
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      setReviews({ 
-        user_reviews: [], 
-        expert_reviews: [], 
-        total_user_reviews: 0, 
-        total_expert_reviews: 0 
+      setReviews({
+        user_reviews: [],
+        expert_reviews: [],
+        total_user_reviews: 0,
+        total_expert_reviews: 0
       });
     }
   };
@@ -66,26 +66,15 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
   useEffect(() => {
     if (isOpen && product) {
+      setIsActive(true);
       fetchTechnicalSpecs();
       fetchReviews();
       fetchImages();
-      setQuantity(1); // Reset quantity when modal opens
-    }
-  }, [isOpen, product]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => setIsActive(true), 10);
     } else {
       setIsActive(false);
-      setTechnicalSpecs(null);
-      setReviews(null);
-      setProductImages([]);
-      setSelectedImage(null);
+      setQuantity(1); // Reset quantity when modal closes
     }
-  }, [isOpen]);
-
-  if (!isOpen || !product) return null;
+  }, [isOpen, product]);
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -103,45 +92,11 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
     setSelectedImage(image);
   };
 
-  const handleAddToCart = () => {
-    onAddToCart({ ...product, quantity });
-    setQuantity(1);
-    handleCloseClick();
+  if (!isOpen || !product) return null;
+
+  const renderStars = (rating, maxStars = 5) => {
+    return '★'.repeat(Math.floor(rating)) + '☆'.repeat(maxStars - Math.floor(rating));
   };
-
-  const thumbnails = productImages.filter(img => !img.is_primary);
-
-  const specsTable = [
-    { label: "Hand Size", value: product.hand_size },
-    { label: "Grip Style", value: product.grip_style },
-    { label: "Brand", value: product.brand },
-    { label: "Connection Type", value: product.is_wireless ? "Wireless" : "Wired" },
-    { label: "DPI", value: technicalSpecs?.dpi },
-    { label: "Weight", value: technicalSpecs?.weight_g ? `${technicalSpecs.weight_g}g` : null },
-    { label: "Sensor", value: technicalSpecs?.sensor_type },
-    { label: "Polling Rate", value: technicalSpecs?.polling_rate ? `${technicalSpecs.polling_rate}Hz` : null },
-    { 
-      label: "Dimensions", 
-      value: technicalSpecs?.length_mm ? 
-        `${technicalSpecs.length_mm} x ${technicalSpecs.width_mm} x ${technicalSpecs.height_mm} mm` : null 
-    },
-    { label: "Switch Type", value: technicalSpecs?.switch_type },
-    { 
-      label: "Switch Durability", 
-      value: technicalSpecs?.switch_durability ? 
-        `${technicalSpecs.switch_durability.toLocaleString()} clicks` : null 
-    },
-    { 
-      label: "Battery Life", 
-      value: technicalSpecs?.battery_life ? `${technicalSpecs.battery_life}h` : null 
-    },
-    { 
-      label: "RGB Lighting", 
-      value: technicalSpecs?.rgb_lighting !== undefined ? 
-        (technicalSpecs.rgb_lighting ? 'Yes' : 'No') : null 
-    },
-    { label: "Cable Type", value: technicalSpecs?.cable_type }
-  ];
 
   return (
     <div 
@@ -159,15 +114,14 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                   <img 
                     src={selectedImage.image_url} 
                     alt={product.name}
-                    className="product-image"
                   />
                 ) : (
                   <NoImagePlaceholder />
                 )}
               </div>
               <div className="thumbnails">
-                {thumbnails.length > 0 ? (
-                  thumbnails.map((image) => (
+                {productImages.length > 0 ? (
+                  productImages.map((image) => (
                     <div 
                       key={image.image_id} 
                       className={`thumbnail ${selectedImage?.image_id === image.image_id ? 'active' : ''}`}
@@ -192,10 +146,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 <div className="ratings-container">
                   {reviews.total_expert_reviews > 0 && (
                     <div className="expert-rating">
-                      <span className="stars expert">
-                        {'★'.repeat(Math.floor(reviews.expert_average))}
-                        {'☆'.repeat(5 - Math.floor(reviews.expert_average))}
-                      </span>
+                      <span className="stars">{renderStars(reviews.expert_average)}</span>
                       <span className="rating-text">
                         ({reviews.expert_average}/5) Expert Rating
                       </span>
@@ -203,10 +154,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                   )}
                   {reviews.total_user_reviews > 0 && (
                     <div className="user-rating">
-                      <span className="stars user">
-                        {'★'.repeat(Math.floor(reviews.user_average))}
-                        {'☆'.repeat(5 - Math.floor(reviews.user_average))}
-                      </span>
+                      <span className="stars">{renderStars(reviews.user_average)}</span>
                       <span className="rating-text">
                         ({reviews.user_average}/5) User Rating
                       </span>
@@ -215,35 +163,143 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                 </div>
               )}
 
-              <p className="description">{product.description}</p>
-
-              <div className="specifications">
-                <h3>Technical Specifications</h3>
-                <div className="specs-grid">
-                  {specsTable.map((spec, index) => 
-                    spec.value ? (
-                      <div key={index} className="spec-item">
-                        <span className="spec-label">{spec.label}</span>
-                        <span className="spec-value capitalize">{spec.value}</span>
-                      </div>
-                    ) : null
-                  )}
-                </div>
-              </div>
+              <p className="description">{product.description || "Professional Gaming Mouse"}</p>
 
               <div className="price-section">
-                <div className="price-quantity">
-                  <span className="price">${(Number(product.price) * quantity).toLocaleString()}</span>
+                <div className="price-display">
+                  {product.hasPromotion ? (
+                    <>
+                      <span className="discounted-price">
+                        ${product.discountedPrice.toLocaleString()}
+                      </span>
+                      <span className="original-price">
+                        ${product.price.toLocaleString()}
+                      </span>
+                      <span className="discount-badge">
+                        -{product.discountPercentage}%
+                      </span>
+                    </>
+                  ) : (
+                    <span className="current-price">
+                      ${product.price.toLocaleString()}
+                    </span>
+                  )}
                 </div>
 
-                <button 
-                  className="add-to-cart"
-                  disabled={product.stock_quantity === 0}
-                  onClick={handleAddToCart}
-                >
-                  {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
-                </button>
+                <div className="add-to-cart-section">
+                  <div className="quantity-controls">
+                    <button 
+                      onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                      disabled={quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="quantity">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(prev => prev + 1)}
+                      disabled={quantity >= product.stock_quantity}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button 
+                    className="add-to-cart-button"
+                    onClick={() => {
+                      onAddToCart({...product, quantity});
+                      handleCloseClick();
+                    }}
+                    disabled={product.stock_quantity === 0}
+                  >
+                    {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  </button>
+                </div>
               </div>
+
+              {technicalSpecs && (
+                <div className="specifications">
+                  <h3>Technical Specifications</h3>
+                  <div className="specs-grid">
+                    <div className="spec-item">
+                      <span className="spec-label">Cỡ tay</span>
+                      <span className="spec-value">{technicalSpecs.hand_size}</span>
+                    </div>
+                    <div className="spec-item">
+                      <span className="spec-label">Kiểu cầm</span>
+                      <span className="spec-value">{technicalSpecs.grip_style}</span>
+                    </div>
+                    <div className="spec-item">
+                      <span className="spec-label">Hãng</span>
+                      <span className="spec-value">{technicalSpecs.brand}</span>
+                    </div>
+                    <div className="spec-item">
+                      <span className="spec-label">Kết nối</span>
+                      <span className="spec-value">{technicalSpecs.is_wireless ? 'Không dây' : 'Cắm dây'}</span>
+                    </div>
+                    {technicalSpecs.dpi && (
+                      <div className="spec-item">
+                        <span className="spec-label">DPI</span>
+                        <span className="spec-value">{technicalSpecs.dpi}</span>
+                      </div>
+                    )}
+                    {technicalSpecs.weight_g && (
+                      <div className="spec-item">
+                        <span className="spec-label">Trọng lượng</span>
+                        <span className="spec-value">{technicalSpecs.weight_g}g</span>
+                      </div>
+                    )}
+                    {technicalSpecs.sensor_type && (
+                      <div className="spec-item">
+                        <span className="spec-label">Cảm biến</span>
+                        <span className="spec-value">{technicalSpecs.sensor_type}</span>
+                      </div>
+                    )}
+                    {technicalSpecs.polling_rate && (
+                      <div className="spec-item">
+                        <span className="spec-label">Polling Rate</span>
+                        <span className="spec-value">{technicalSpecs.polling_rate}Hz</span>
+                      </div>
+                    )}
+                    {technicalSpecs.length_mm && (
+                      <div className="spec-item">
+                        <span className="spec-label">Kích thước</span>
+                        <span className="spec-value">
+                          {technicalSpecs.length_mm} × {technicalSpecs.width_mm} × {technicalSpecs.height_mm} mm
+                        </span>
+                      </div>
+                    )}
+                    {technicalSpecs.switch_type && (
+                      <div className="spec-item">
+                        <span className="spec-label">Nút bấm</span>
+                        <span className="spec-value">{technicalSpecs.switch_type}</span>
+                      </div>
+                    )}
+                    {technicalSpecs.switch_durability && (
+                      <div className="spec-item">
+                        <span className="spec-label">Độ bền nút bấm</span>
+                        <span className="spec-value">{technicalSpecs.switch_durability.toLocaleString()} Clicks</span>
+                      </div>
+                    )}
+                    {technicalSpecs.battery_life && (
+                      <div className="spec-item">
+                        <span className="spec-label">Thời lượng pin</span>
+                        <span className="spec-value">{technicalSpecs.battery_life}h</span>
+                      </div>
+                    )}
+                    {technicalSpecs.rgb_lighting !== undefined && (
+                      <div className="spec-item">
+                        <span className="spec-label">Đèn RGB</span>
+                        <span className="spec-value">{technicalSpecs.rgb_lighting ? 'Yes' : 'No'}</span>
+                      </div>
+                    )}
+                    {technicalSpecs.cable_type && (
+                      <div className="spec-item">
+                        <span className="spec-label">Dây cắm</span>
+                        <span className="spec-value">{technicalSpecs.cable_type}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -20,8 +20,10 @@ class ProductPage extends Component {
         handSize: [],
         gripStyle: [],
         brand: [],
-        isWireless: false
+        isWireless: false,
+        usePreferences: false
       },
+      userPreferences: null,
       priceRange: {
         min: "",
         max: ""
@@ -35,6 +37,7 @@ class ProductPage extends Component {
   }
 
   async componentDidMount() {
+    await this.fetchUserPreferences();
     try {
       // Fetch products
       const response = await axiosInstance.get('/products/');
@@ -127,6 +130,48 @@ class ProductPage extends Component {
     }
   }
 
+  fetchUserPreferences = async () => {
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    if (!currentUser) return;
+
+    try {
+      const response = await axiosInstance.get(`/users/${currentUser.user_id}/preferences`);
+      if (response.data && Object.keys(response.data).length > 0) {
+        this.setState({ userPreferences: response.data });
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+    }
+  };
+
+  handlePreferenceFilter = () => {
+    this.setState(
+      (prevState) => ({
+        filters: {
+          ...prevState.filters,
+          usePreferences: !prevState.filters.usePreferences,
+          handSize: prevState.filters.usePreferences ? [] : prevState.filters.handSize,
+          gripStyle: prevState.filters.usePreferences ? [] : prevState.filters.gripStyle,
+          isWireless: prevState.filters.usePreferences ? undefined : prevState.filters.isWireless,
+        },
+      }),
+      () => {
+        if (this.state.filters.usePreferences) {
+          this.handlePreferenceCheckboxes();
+        }
+        this.applyFilters();
+      }
+    );
+  };
+  
+  handlePreferenceCheckboxes = () => {
+    if (this.state.filters.usePreferences && this.state.userPreferences) {
+      this.handleFilterChange('handSize', this.state.userPreferences.hand_size);
+      this.handleFilterChange('gripStyle', this.state.userPreferences.grip_style);
+      this.handleFilterChange('isWireless', this.state.userPreferences.wireless_preferred);
+    }
+  };
+
   handleAddToCartFromModal = (productWithQuantity) => {
     this.props.onAddToCart(productWithQuantity);
   };
@@ -184,8 +229,8 @@ class ProductPage extends Component {
   };
 
   applyFilters = () => {
-    const { products, filters, priceRange } = this.state;
-
+    const { products, filters, priceRange, userPreferences } = this.state;
+    
     let filtered = products.filter(product => {
       if (filters.inStock && product.stock_quantity <= 0) {
         return false;
@@ -258,6 +303,8 @@ class ProductPage extends Component {
             brands={uniqueBrands}
             handSizes={uniqueHandSizes}
             gripStyles={uniqueGripStyles}
+            userPreferences={this.state.userPreferences}
+            onPreferenceFilterChange={this.handlePreferenceFilter}
           />
           
           <div className="products-grid">

@@ -55,8 +55,20 @@ class AuthService {
     }
 
     getCurrentUser() {
-        const userData = localStorage.getItem('user');
-        return userData ? JSON.parse(userData) : null;
+        try {
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                console.log('No user data in localStorage');
+                return null;
+            }
+            
+            const user = JSON.parse(userData);
+            console.log('Current user:', { ...user, access_token: '[REDACTED]' });
+            return user;
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            return null;
+        }
     }
 
     async getCurrentUserInfo() {
@@ -75,6 +87,7 @@ class AuthService {
     }
 
     logout() {
+        console.log('Logging out user');
         localStorage.removeItem('user');
     }
 
@@ -97,18 +110,40 @@ class AuthService {
 
     isTokenExpired() {
         const user = this.getCurrentUser();
-        if (!user?.access_token) return true;
+        if (!user?.access_token) {
+            console.log('No user or token found');
+            return true;
+        }
 
         try {
             const token = user.access_token;
             const tokenParts = token.split('.');
-            if (tokenParts.length !== 3) return true;
+            
+            if (tokenParts.length !== 3) {
+                console.error('Invalid token format');
+                return true;
+            }
 
             const payload = JSON.parse(atob(tokenParts[1]));
-            const expiration = payload.exp * 1000;
-            // Thêm buffer 5 giây để tránh edge cases
-            return Date.now() >= (expiration - 5000);
-        } catch {
+            const expiration = payload.exp * 1000; // Convert to milliseconds
+            const currentTime = Date.now();
+            
+            // Add buffer time (15 seconds) to prevent edge cases
+            const isExpired = currentTime >= (expiration - 15000);
+            
+            if (isExpired) {
+                console.log('Token expired:', {
+                    currentTime: new Date(currentTime).toISOString(),
+                    expirationTime: new Date(expiration).toISOString(),
+                    timeUntilExpiration: Math.floor((expiration - currentTime) / 1000) + ' seconds'
+                });
+            } else {
+                console.log('Token valid for:', Math.floor((expiration - currentTime) / 1000), 'seconds');
+            }
+            
+            return isExpired;
+        } catch (error) {
+            console.error('Error checking token expiration:', error);
             return true;
         }
     }
@@ -124,4 +159,5 @@ class AuthService {
     }
 }
 
-export default new AuthService();
+const authService = new AuthService();
+export default authService;

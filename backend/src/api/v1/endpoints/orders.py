@@ -19,10 +19,17 @@ async def create_order(
         # Start transaction
         conn.start_transaction()
         
-        # Check if all products are in stock
+        # Initialize promotion and coupon variables
+        promotion_id = None
+        promotion_discount = 0
+        coupon_id = None 
+        coupon_discount = 0
+        total_amount = 0
+        
+        # Check if all products are in stock and calculate initial total
         for item in order.items:
             cursor.execute(
-                "SELECT stock_quantity, price FROM products WHERE product_id = %s",
+                "SELECT stock_quantity, price, product_id FROM products WHERE product_id = %s",
                 (item.product_id,)
             )
             product = cursor.fetchone()
@@ -35,23 +42,84 @@ async def create_order(
                     status_code=400,
                     detail=f"Not enough stock for product {item.product_id}"
                 )
-        
-        # Calculate total amount
-        total_amount = 0
-        for item in order.items:
+            
+            # Calculate item subtotal
+            item_subtotal = float(product['price']) * item.quantity
+            total_amount += item_subtotal
+
+            # Check for active promotions
+            cursor.execute("""
+                SELECT p.* FROM promotions p
+                JOIN product_promotions pp ON p.promotion_id = pp.promotion_id
+                WHERE pp.product_id = %s
+                AND p.is_active = 1
+                AND p.start_date <= NOW()
+                AND p.end_date >= NOW()
+                ORDER BY p.discount_value DESC
+                LIMIT 1
+            """, (product['product_id'],))
+            
+            promotion = cursor.fetchone()
+            if promotion:
+                # Calculate promotion discount
+                if promotion['discount_type'] == 'percentage':
+                    item_discount = item_subtotal * (float(promotion['discount_value']) / 100)
+                else:
+                    item_discount = float(promotion['discount_value']) * item.quantity
+
+                # Apply max discount limit if exists
+                if promotion['max_discount_amount']:
+                    item_discount = min(item_discount, float(promotion['max_discount_amount']))
+
+                promotion_discount += item_discount
+                promotion_id = promotion['promotion_id']
+
+        # Apply coupon if provided
+        if order.coupon_id:
             cursor.execute(
-                "SELECT price FROM products WHERE product_id = %s",
-                (item.product_id,)
+                """SELECT * FROM coupons 
+                   WHERE coupon_id = %s 
+                   AND is_active = 1
+                   AND start_date <= NOW()
+                   AND end_date >= NOW()""",
+                (order.coupon_id,)
             )
-            product = cursor.fetchone()
-            total_amount += float(product['price']) * item.quantity
+            coupon = cursor.fetchone()
+            
+            if coupon:
+                # Check usage limits
+                cursor.execute(
+                    """SELECT COUNT(*) as use_count 
+                       FROM coupon_usage_history 
+                       WHERE coupon_id = %s AND user_id = %s""",
+                    (coupon['coupon_id'], current_user["user_id"])
+                )
+                usage = cursor.fetchone()
+                
+                if usage['use_count'] < coupon['user_usage_limit']:
+                    # Calculate coupon discount
+                    if coupon['discount_type'] == 'percentage':
+                        coupon_discount = (total_amount - promotion_discount) * (float(coupon['discount_value']) / 100)
+                    else:
+                        coupon_discount = float(coupon['discount_value'])
+
+                    # Apply max discount limit if exists
+                    if coupon['max_discount_amount']:
+                        coupon_discount = min(coupon_discount, float(coupon['max_discount_amount']))
+
+                    coupon_id = coupon['coupon_id']
+
+        # Calculate final total
+        final_total = total_amount - promotion_discount - coupon_discount
         
-        # Create order
+        # Create order with promotion and coupon details
         cursor.execute(
             """INSERT INTO orders 
-               (user_id, total_amount, status, shipping_address)
-               VALUES (%s, %s, %s, %s)""",
-            (current_user["user_id"], total_amount, "pending", order.shipping_address)
+               (user_id, total_amount, status, shipping_address, note,
+                promotion_id, discount_amount, coupon_id, coupon_discount)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (current_user["user_id"], final_total, "pending", order.shipping_address, order.note,
+             promotion_id, promotion_discount, coupon_id, coupon_discount)
         )
         order_id = cursor.lastrowid
         
@@ -78,6 +146,32 @@ async def create_order(
                    SET stock_quantity = stock_quantity - %s 
                    WHERE product_id = %s""",
                 (item.quantity, item.product_id)
+            )
+
+        # Record coupon usage if applied
+        if coupon_id:
+            cursor.execute(
+                """INSERT INTO coupon_usage_history 
+                   (coupon_id, user_id, order_id, discount_amount)
+                   VALUES (%s, %s, %s, %s)""",
+                (coupon_id, current_user["user_id"], order_id, coupon_discount)
+            )
+            
+            # Update coupon used count
+            cursor.execute(
+                """UPDATE coupons 
+                   SET used_count = used_count + 1 
+                   WHERE coupon_id = %s""",
+                (coupon_id,)
+            )
+
+        # Update promotion usage if applied
+        if promotion_id:
+            cursor.execute(
+                """UPDATE promotions 
+                   SET used_count = used_count + 1 
+                   WHERE promotion_id = %s""",
+                (promotion_id,)
             )
         
         # Clear cart after successful order

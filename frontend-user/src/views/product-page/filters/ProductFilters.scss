@@ -74,3 +74,26 @@
     }
   }
 }
+
+.preferences-summary {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.875rem;
+
+  .preference-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+
+    .label {
+      color: #6b7280;
+    }
+
+    .value {
+      color: #111827;
+      font-weight: 500;
+    }
+  }
+}

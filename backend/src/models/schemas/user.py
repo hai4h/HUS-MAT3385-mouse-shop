@@ -46,3 +46,11 @@ class User(UserBase):
     address: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+
+class ChangeEmailRequest(BaseModel):
+    current_password: str
+    new_email: EmailStr
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
