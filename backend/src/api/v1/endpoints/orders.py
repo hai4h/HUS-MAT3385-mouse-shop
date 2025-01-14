@@ -260,3 +260,96 @@ async def get_order_details(
     finally:
         cursor.close()
         conn.close()
+
+@router.patch("/{order_id}/cancel", response_model=OrderResponse)
+async def cancel_order(
+    order_id: int,
+    current_user = Depends(get_current_user)
+):
+    """Cancel a pending order"""
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Start transaction
+        conn.start_transaction()
+        
+        # First, check if order exists and belongs to current user
+        cursor.execute(
+            """SELECT * FROM orders 
+               WHERE order_id = %s AND user_id = %s AND status = 'pending'""",
+            (order_id, current_user["user_id"])
+        )
+        order = cursor.fetchone()
+        
+        # If no order found, raise 404
+        if not order:
+            raise HTTPException(
+                status_code=404, 
+                detail="No pending order found with this ID"
+            )
+        
+        # Update order status to cancelled
+        cursor.execute(
+            """UPDATE orders 
+               SET status = 'cancelled' 
+               WHERE order_id = %s""",
+            (order_id,)
+        )
+        
+        # Restore product quantities
+        cursor.execute(
+            """UPDATE products p
+               JOIN order_details od ON p.product_id = od.product_id
+               SET p.stock_quantity = p.stock_quantity + od.quantity
+               WHERE od.order_id = %s""",
+            (order_id,)
+        )
+        
+        # Revert coupon usage if applicable
+        cursor.execute(
+            """SELECT coupon_id FROM orders 
+               WHERE order_id = %s AND coupon_id IS NOT NULL""",
+            (order_id,)
+        )
+        coupon = cursor.fetchone()
+        
+        if coupon and coupon['coupon_id']:
+            # Decrement coupon used count
+            cursor.execute(
+                """UPDATE coupons 
+                   SET used_count = used_count - 1 
+                   WHERE coupon_id = %s""",
+                (coupon['coupon_id'],)
+            )
+            
+            # Remove coupon usage history
+            cursor.execute(
+                """DELETE FROM coupon_usage_history 
+                   WHERE order_id = %s""",
+                (order_id,)
+            )
+        
+        # Commit the transaction
+        conn.commit()
+        
+        # Fetch and return the updated order
+        cursor.execute(
+            """SELECT o.*, GROUP_CONCAT(p.name) as products
+               FROM orders o
+               JOIN order_details od ON o.order_id = od.order_id
+               JOIN products p ON od.product_id = p.product_id
+               WHERE o.order_id = %s
+               GROUP BY o.order_id""",
+            (order_id,)
+        )
+        updated_order = cursor.fetchone()
+        
+        return updated_order
+        
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()

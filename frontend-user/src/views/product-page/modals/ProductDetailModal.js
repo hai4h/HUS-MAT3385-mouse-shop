@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import "./ProductDetailModal.scss";
+import "../../../styles/desktop/ProductDetailModal.scss";
 import axiosInstance from '../../../services/axiosConfig';
+import { TrackProductView } from '../../../components/TrackProductView';
 
 const NoImagePlaceholder = () => (
   <div className="no-image-placeholder">
@@ -66,6 +67,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
   useEffect(() => {
     if (isOpen && product) {
+      TrackProductView(product.product_id);
       setIsActive(true);
       fetchTechnicalSpecs();
       fetchReviews();
@@ -75,6 +77,21 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
       setQuantity(1); // Reset quantity when modal closes
     }
   }, [isOpen, product]);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Thêm class và ngăn scroll khi modal mở
+      document.body.classList.add('modal-open');
+    } else {
+      // Xóa class và cho phép scroll khi modal đóng
+      document.body.classList.remove('modal-open');
+    }
+  
+    // Cleanup khi component unmount
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -148,7 +165,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                     <div className="expert-rating">
                       <span className="stars">{renderStars(reviews.expert_average)}</span>
                       <span className="rating-text">
-                        ({reviews.expert_average}/5) Expert Rating
+                        ({reviews.expert_average}/5) Điểm chuyên gia
                       </span>
                     </div>
                   )}
@@ -156,7 +173,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                     <div className="user-rating">
                       <span className="stars">{renderStars(reviews.user_average)}</span>
                       <span className="rating-text">
-                        ({reviews.user_average}/5) User Rating
+                        ({reviews.user_average}/5) Điểm người dùng
                       </span>
                     </div>
                   )}
@@ -210,18 +227,22 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                     }}
                     disabled={product.stock_quantity === 0}
                   >
-                    {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    {product.stock_quantity === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
                   </button>
                 </div>
               </div>
 
               {technicalSpecs && (
                 <div className="specifications">
-                  <h3>Technical Specifications</h3>
+                  <h3>Thông số kỹ thuật</h3>
                   <div className="specs-grid">
                     <div className="spec-item">
                       <span className="spec-label">Cỡ tay</span>
-                      <span className="spec-value">{technicalSpecs.hand_size}</span>
+                      <span className="spec-value">
+                        {technicalSpecs.hand_size === 'small' ? 'nhỏ (<17.5cm)' : 
+                        technicalSpecs.hand_size === 'medium' ? 'vừa (18-19.5cm)' : 
+                        technicalSpecs.hand_size === 'large' ? 'lớn (>20cm)' : 'Không xác định'}
+                      </span>
                     </div>
                     <div className="spec-item">
                       <span className="spec-label">Kiểu cầm</span>
@@ -279,10 +300,15 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                         <span className="spec-value">{technicalSpecs.switch_durability.toLocaleString()} Clicks</span>
                       </div>
                     )}
-                    {technicalSpecs.battery_life && (
+                    {technicalSpecs.is_wireless ? (
                       <div className="spec-item">
                         <span className="spec-label">Thời lượng pin</span>
                         <span className="spec-value">{technicalSpecs.battery_life}h</span>
+                      </div>
+                    ) : (
+                      <div className="spec-item">
+                        <span className="spec-label">Thời lượng pin</span>
+                        <span className="spec-value"></span>
                       </div>
                     )}
                     {technicalSpecs.rgb_lighting !== undefined && (

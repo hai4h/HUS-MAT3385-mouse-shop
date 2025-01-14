@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import "../../views/App.scss";
-import "./ProductPage.scss";
-import "../cart/Cart.scss";
+import "../../styles/App.scss";
+import "../../styles/desktop/ProductPage.scss";
+import "../../styles/desktop/Cart.scss";
 
 import axiosInstance from "../../services/axiosConfig";
 import ProductFilters from "./filters/ProductFilters";
 import ProductDetailModal from "./modals/ProductDetailModal";
+import MobileProductFilters from "../mobile/MobileProductFilters";
 
 class ProductPage extends Component {
   constructor(props) {
@@ -290,11 +291,21 @@ class ProductPage extends Component {
 
     return (
       <div className="product-page">
-        <header>
-          <h1>Sản phẩm Chuột</h1>
-        </header>
         <div className="products">
           <ProductFilters 
+            filters={filters}
+            onFilterChange={this.handleFilterChange}
+            priceRange={priceRange}
+            onPriceChange={this.handlePriceChange}
+            handleStockFilter={this.handleStockFilter}
+            brands={uniqueBrands}
+            handSizes={uniqueHandSizes}
+            gripStyles={uniqueGripStyles}
+            userPreferences={this.state.userPreferences}
+            onPreferenceFilterChange={this.handlePreferenceFilter}
+          />
+
+          <MobileProductFilters 
             filters={filters}
             onFilterChange={this.handleFilterChange}
             priceRange={priceRange}

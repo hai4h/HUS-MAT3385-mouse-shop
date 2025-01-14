@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import authService from "../../services/authService";
-import "./LoginSignup.scss";
+import "../../styles/desktop/LoginSignup.scss";
 
 class LoginForm extends Component {
     constructor(props) {

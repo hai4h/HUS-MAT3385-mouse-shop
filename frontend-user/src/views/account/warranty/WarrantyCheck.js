@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../services/axiosConfig';
-import './WarrantyCheck.scss'
+import '../../../styles/desktop/WarrantyCheck.scss'
 
 const WarrantyCheck = ({ user }) => {
   const [orders, setOrders] = useState([]);

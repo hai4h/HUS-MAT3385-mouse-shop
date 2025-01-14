@@ -1,5 +1,5 @@
 import React from 'react';
-import "./ProductFilters.scss"
+import "../../../styles/desktop/ProductFilters.scss"
 
 const ProductFilters = ({ 
   filters, 

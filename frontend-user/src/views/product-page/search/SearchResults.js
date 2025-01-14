@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './SearchResults.scss'
+import '../../../styles/desktop/SearchResults.scss'
 
 const SearchResults = ({ 
   products, 

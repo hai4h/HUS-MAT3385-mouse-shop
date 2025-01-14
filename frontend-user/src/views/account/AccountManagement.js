@@ -8,8 +8,9 @@ import { ChangeEmailModal, ChangePasswordModal } from '../../components/modals/A
 import Toast from '../toast/Toast';
 import SessionExpiredModal from '../session/SessionExpiredModal';
 import WarrantyCheck from './warranty/WarrantyCheck';
+import ReviewModal from '../../components/modals/ReviewModal';
 
-import './AccountManagement.scss';
+import '../../styles/desktop/AccountManagement.scss';
 import { RiHome9Line } from "react-icons/ri";
 
 const AccountManagement = () => {
@@ -27,6 +28,9 @@ const AccountManagement = () => {
     const [toastMessage, setToastMessage] = useState('');
     const [showSessionExpiredModal, setShowSessionExpiredModal] = useState(false);
     const [userPreferences, setUserPreferences] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [cancelLoading, setCancelLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         full_name: '',
@@ -441,6 +445,23 @@ const AccountManagement = () => {
     };
     
     const renderOrders = () => {
+        const handleCancelOrder = async (orderId) => {
+            if (!window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+                return;
+            }
+        
+            setCancelLoading(true);
+            try {
+                await axiosInstance.patch(`/orders/${orderId}/cancel`);
+                await fetchOrders();
+                showToastMessage('Đã hủy đơn hàng thành công');
+            } catch (error) {
+                showToastMessage('Không thể hủy đơn hàng. Vui lòng thử lại.');
+            } finally {
+                setCancelLoading(false);
+            }
+        };
+
         return (
             <>
                 <div className="card-header">
@@ -468,7 +489,12 @@ const AccountManagement = () => {
                                             </span>
                                         </div>
                                         <span className={`status-badge ${order.status}`}>
-                                            {order.status}
+                                            {order.status === 'pending' ? 'Chờ xác nhận' :
+                                            order.status === 'processing' ? 'Đang xử lý' :
+                                            order.status === 'shipped' ? 'Đang giao' :
+                                            order.status === 'delivered' ? 'Đã giao' :
+                                            order.status === 'cancelled' ? 'Đã hủy' : 
+                                            order.status}
                                         </span>
                                     </div>
                                     <div className="order-products">
@@ -481,11 +507,53 @@ const AccountManagement = () => {
                                             ${Number(order.total_amount).toLocaleString()}
                                         </span>
                                     </div>
+
+                                    <div className="order-actions">
+                                        {order.status === 'pending' && (
+                                            <button
+                                                onClick={() => handleCancelOrder(order.order_id)}
+                                                className="cancel-order-button"
+                                                disabled={cancelLoading}
+                                            >
+                                                {cancelLoading ? 'Đang hủy...' : 'Hủy đơn hàng'}
+                                            </button>
+                                        )}
+                                        
+                                        {order.status === 'delivered' && (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedOrder({
+                                                        order_id: order.order_id,
+                                                        product_name: order.products // Tên sản phẩm từ order
+                                                    });
+                                                    setShowReviewModal(true);
+                                                }}
+                                                className="review-order-button"
+                                            >
+                                                Đánh giá sản phẩm
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
+
+                {selectedOrder && showReviewModal && (
+                    <ReviewModal
+                        isOpen={showReviewModal}
+                        onClose={() => {
+                            setShowReviewModal(false);
+                            setSelectedOrder(null);
+                        }}
+                        orderDetail={selectedOrder}
+                        onReviewSubmitted={() => {
+                            showToastMessage('Đã gửi đánh giá thành công');
+                            fetchOrders();
+                        }}
+                    />
+                )}
             </>
         );
     };

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 13, 2025 at 12:50 PM
+-- Generation Time: Jan 14, 2025 at 04:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -70,6 +70,13 @@ CREATE TABLE `cart_items` (
   `quantity` int(11) NOT NULL,
   `added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
+(54, 1, 2, 1, '2025-01-14 10:53:46');
 
 -- --------------------------------------------------------
 
@@ -225,23 +232,6 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `quant
 -- --------------------------------------------------------
 
 --
--- Table structure for table `page_views`
---
-
-CREATE TABLE `page_views` (
-  `pageview_id` bigint(20) UNSIGNED NOT NULL,
-  `session_id` varchar(100) DEFAULT NULL,
-  `url_path` varchar(255) NOT NULL,
-  `referrer` varchar(255) DEFAULT NULL,
-  `viewed_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `device_type` varchar(50) DEFAULT NULL,
-  `browser` varchar(50) DEFAULT NULL,
-  `os` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `products`
 --
 
@@ -272,7 +262,12 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_qua
 (2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 46, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
 (3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 39, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
 (4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 28, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
-(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15');
+(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15'),
+(6, 'Razer Viper Ultimate', 'Wireless gaming mouse with optical switches and 20K DPI sensor', 149.99, 25, 'medium', 'claw', 1, 'Razer', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
+(7, 'Zowie EC2', 'Ergonomic gaming mouse for medium to large hands', 69.99, 40, 'large', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
+(8, 'SteelSeries Rival 650', 'Wireless gaming mouse with dual sensor system and weight customization', 129.99, 15, 'large', 'palm', 1, 'SteelSeries', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
+(9, 'Logitech G305', 'Wireless gaming mouse with HERO sensor and long battery life', 59.99, 50, 'small', 'fingertip', 1, 'Logitech', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
+(10, 'Glorious Model D', 'Lightweight ergonomic gaming mouse with honeycomb shell', 49.99, 30, 'medium', 'palm', 0, 'Glorious PC Gaming Race', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38');
 
 -- --------------------------------------------------------
 
@@ -309,6 +304,61 @@ INSERT INTO `product_promotions` (`product_promotion_id`, `product_id`, `promoti
 (1, 1, 1, '2025-01-09 17:06:11'),
 (2, 2, 1, '2025-01-09 17:06:11'),
 (3, 3, 1, '2025-01-09 17:06:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_views`
+--
+
+CREATE TABLE `product_views` (
+  `view_id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` bigint(20) UNSIGNED NOT NULL,
+  `session_id` varchar(100) NOT NULL,
+  `viewed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_views`
+--
+
+INSERT INTO `product_views` (`view_id`, `product_id`, `session_id`, `viewed_at`) VALUES
+(1, 1, '1736864067176-85mzn8s5g', '2025-01-14 14:14:27'),
+(2, 4, '1736864067176-85mzn8s5g', '2025-01-14 14:14:47'),
+(3, 4, '1736864067176-85mzn8s5g', '2025-01-14 14:15:21'),
+(4, 1, '1736864067176-85mzn8s5g', '2025-01-14 14:16:57'),
+(5, 5, '1736864067176-85mzn8s5g', '2025-01-14 14:17:00'),
+(6, 2, '1736864236968-fwo31h00s', '2025-01-14 14:17:16'),
+(7, 2, '1736864236968-fwo31h00s', '2025-01-14 14:22:46'),
+(8, 2, '1736864067176-85mzn8s5g', '2025-01-14 14:24:08'),
+(9, 2, '1736864067176-85mzn8s5g', '2025-01-14 14:24:15'),
+(10, 2, '1736864067176-85mzn8s5g', '2025-01-14 14:24:23'),
+(11, 2, '1736864236968-fwo31h00s', '2025-01-14 14:25:10'),
+(12, 2, '1736864236968-fwo31h00s', '2025-01-14 14:25:24'),
+(13, 2, '1736864236968-fwo31h00s', '2025-01-14 14:27:32'),
+(14, 3, '1736864067176-85mzn8s5g', '2025-01-14 15:34:41'),
+(15, 3, '1736864067176-85mzn8s5g', '2025-01-14 15:39:47'),
+(16, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:39:49'),
+(17, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:39:51'),
+(18, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:07'),
+(19, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:09'),
+(20, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:13'),
+(21, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:25'),
+(22, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:31'),
+(23, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:34'),
+(24, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:37'),
+(25, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:42'),
+(26, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:44'),
+(27, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:46'),
+(28, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:40:48'),
+(29, 3, '1736864067176-85mzn8s5g', '2025-01-14 15:40:51'),
+(30, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:41:36'),
+(31, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:42:09'),
+(32, 4, '1736864067176-85mzn8s5g', '2025-01-14 15:42:16'),
+(33, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:42:24'),
+(34, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:16'),
+(35, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:28'),
+(36, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:53');
 
 -- --------------------------------------------------------
 
@@ -436,7 +486,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `address`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'admintest', 'admin@example.com', '$2b$12$.4tn.sVnaxkxlxMhpXaURuVE0gBta5Z/aE7S7GIcDU0s19.cgZaLm', 'Hoang Dinh Hai Anh', NULL, NULL, 'admin', '2024-12-04 03:38:09', '2024-12-04 03:38:09'),
-(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 11:48:56');
+(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 12:12:00');
 
 -- --------------------------------------------------------
 
@@ -459,7 +509,7 @@ CREATE TABLE `user_preferences` (
 --
 
 INSERT INTO `user_preferences` (`preference_id`, `user_id`, `hand_size`, `grip_style`, `wireless_preferred`, `usage_type`, `updated_at`) VALUES
-(1, 2, 'medium', 'claw', 1, 'gaming', '2025-01-13 11:48:56');
+(1, 2, 'medium', 'claw', 1, 'gaming', '2025-01-13 12:12:00');
 
 -- --------------------------------------------------------
 
@@ -588,13 +638,6 @@ ALTER TABLE `order_details`
   ADD KEY `idx_order_details_order_id` (`order_id`);
 
 --
--- Indexes for table `page_views`
---
-ALTER TABLE `page_views`
-  ADD PRIMARY KEY (`pageview_id`),
-  ADD KEY `idx_page_views_session_id` (`session_id`);
-
---
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -614,6 +657,13 @@ ALTER TABLE `product_promotions`
   ADD PRIMARY KEY (`product_promotion_id`),
   ADD KEY `product_id` (`product_id`),
   ADD KEY `promotion_id` (`promotion_id`);
+
+--
+-- Indexes for table `product_views`
+--
+ALTER TABLE `product_views`
+  ADD PRIMARY KEY (`view_id`),
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `promotions`
@@ -655,7 +705,8 @@ ALTER TABLE `users`
 -- Indexes for table `user_preferences`
 --
 ALTER TABLE `user_preferences`
-  ADD PRIMARY KEY (`preference_id`);
+  ADD PRIMARY KEY (`preference_id`),
+  ADD UNIQUE KEY `unique_user_id` (`user_id`);
 
 --
 -- Indexes for table `user_reviews`
@@ -698,7 +749,7 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `coupons`
@@ -737,12 +788,6 @@ ALTER TABLE `order_details`
   MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `page_views`
---
-ALTER TABLE `page_views`
-  MODIFY `pageview_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
@@ -761,6 +806,12 @@ ALTER TABLE `product_promotions`
   MODIFY `product_promotion_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `product_views`
+--
+ALTER TABLE `product_views`
+  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
 -- AUTO_INCREMENT for table `promotions`
 --
 ALTER TABLE `promotions`
@@ -770,7 +821,7 @@ ALTER TABLE `promotions`
 -- AUTO_INCREMENT for table `technical_specs`
 --
 ALTER TABLE `technical_specs`
-  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `traffic_analytics`
@@ -788,7 +839,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_preferences`
 --
 ALTER TABLE `user_preferences`
-  MODIFY `preference_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `preference_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `user_reviews`
@@ -839,6 +890,12 @@ ALTER TABLE `orders`
 ALTER TABLE `product_promotions`
   ADD CONSTRAINT `product_promotions_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`),
   ADD CONSTRAINT `product_promotions_ibfk_2` FOREIGN KEY (`promotion_id`) REFERENCES `promotions` (`promotion_id`);
+
+--
+-- Constraints for table `product_views`
+--
+ALTER TABLE `product_views`
+  ADD CONSTRAINT `product_views_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
 -- Constraints for table `technical_specs`

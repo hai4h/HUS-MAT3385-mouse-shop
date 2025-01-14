@@ -230,13 +230,13 @@
   
           input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 1vh 1vw;
             border: 1px solid #ddd;
             border-radius: 4px;
           }
   
           button {
-            padding: 8px 16px;
+            padding: 1vh 1vw;
             background: #ff0000;
             color: white;
             border: none;
@@ -314,9 +314,11 @@
 
         .coupon-error {
           color: #ff4444;
-          font-size: 0.9em;
+          font-size: 0.875rem;
           margin-top: 5px;
+          margin-bottom: 10px;
           text-align: center;
+          animation: fadeIn 0.3s ease;
         }
       }
     }

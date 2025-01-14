@@ -77,19 +77,23 @@
   min-height: 100vh;
 
   .products-grid {
-    flex: 1;  // Cho phép container mở rộng để lấp đầy không gian còn lại của parent
-    display: grid;  // Sử dụng grid layout
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));  // Tạo columns linh hoạt
-    gap: 5vh;  // Khoảng cách giữa các card
-    align-items: flex-start;  // Quan trọng: Căn các items về phía trên thay vì stretch
+    flex: 1; // Allow container to expand and fill parent space
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); // Flexible columns
+    gap: 2rem; // Spacing between cards
     padding: 2vh;
+    align-content: start;
+    justify-content: center; // Add this line to center the grid
+    height: fit-content;
 
     .product-card {
-      width: 25vh;  // Chiều rộng cố định theo viewport height
-      height: 50vh;  // Chiều cao cố định thay vì min-height
+      justify-self: center; // Center each card within its grid cell
+      width: 100%; // Use full width of grid cell
+      max-width: 30vh; // Maximum width constraint
+      height: 50vh; // Fixed height
       border: 0.2vh solid #ddd;
       border-radius: 0.3vh;
-      padding: 2vh;
+      padding: 1vh 3vh 3vh 3vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -97,7 +101,8 @@
       opacity: 0;
       animation: fadeSlideUp 0.6s ease forwards;
       position: relative;
-      // Add staggered delay based on card index
+
+      // Staggered delay based on card index
       @for $i from 0 through 20 {
         &:nth-child(#{$i + 1}) {
           animation-delay: #{$i * 0.1}s;
@@ -120,7 +125,7 @@
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          min-height: 5vh;
+          min-height: 8vh;
           width: 100%;
           text-align: center;
 

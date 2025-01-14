@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import authService from "../../services/authService";
 import axiosInstance from "../../services/axiosConfig";
-import "./LoginSignup.scss";
+import "../../styles/desktop/LoginSignup.scss";
 
 class SignupForm extends Component {
   constructor(props) {

@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import authService from "../services/authService";
 import axiosInstance from "../services/axiosConfig";
 
-import "../views/App.scss";
-import "../views/product-page/ProductPage.scss"
-import "../views/login-signup/LoginSignup.scss"
-import "../views/user/UserSidebar.scss"
+import '../styles/App.scss';
+import "../styles/desktop/ProductPage.scss"
+import "../styles/desktop/LoginSignup.scss"
+import "../styles/desktop/UserSidebar.scss"
 
 import LoginForm from "../views/login-signup/LoginForm";
 import SignupForm from "../views/login-signup/SignupForm";
@@ -16,10 +16,12 @@ import Toast from "../views/toast/Toast";
 import ProductPage from "../views/product-page/ProductPage";
 import SearchResults from "../views/product-page/search/SearchResults";
 import ProductDetailModal from "../views/product-page/modals/ProductDetailModal";
+import ResponsiveWrapper from "../views/mobile/ResponsiveWrapper";
 
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { RiXrpLine } from "react-icons/ri";
 
 class MyComponent extends Component {
   constructor(props) {
@@ -406,7 +408,7 @@ class MyComponent extends Component {
     try {
       await axiosInstance.post('/cart/add-to-cart', {
         product_id: product.product_id,
-        quantity: 1
+        quantity: product.quantity
       });
   
       await this.fetchCart();
@@ -475,162 +477,172 @@ class MyComponent extends Component {
       user,
       searchQuery,
       showSessionExpiredModal,
-      products, // Thêm products
-      selectedProduct, // Thêm selectedProduct  
-      isModalOpen // Thêm isModalOpen
+      products,
+      selectedProduct,
+      isModalOpen
     } = this.state;
 
     console.log('Rendering MyComponent, showSessionExpiredModal:', showSessionExpiredModal);
 
     return (
-      <div className="app">
-        <Toast 
-          message={toastMessage}
-          isVisible={showToast}
-          onHide={this.hideToast}
-        />
+      <ResponsiveWrapper
+        onSearch={this.handleSearchInput}
+        onToggleCart={this.toggleCart}
+        onToggleUser={user ? this.toggleUserSidebar : this.toggleLogin}
+        cartItemsCount={cartItems.length}
+        user={user}
+      >
+        <div className="app">
+          <Toast 
+            message={toastMessage}
+            isVisible={showToast}
+            onHide={this.hideToast}
+          />
 
-      {console.log('Modal state:', showSessionExpiredModal)}
+        {console.log('Modal state:', showSessionExpiredModal)}
 
-        <div className={`overlay ${(showLogin || showSignup || showCart || showUserSidebar) ? 'active' : ''}`} />
+          <div className={`overlay ${(showLogin || showSignup || showCart || showUserSidebar) ? 'active' : ''}`} />
 
-        <header className="header">
-          <div className="logo">X</div>
-
-          <div className="header-icons">
-            <div className={`search-input-container ${!showSearch ? 'hidden' : ''}`}>
-              <input 
-                type="text" 
-                placeholder="Tìm kiếm..."
-                value={searchQuery}
-                onChange={(e) => this.setState({ searchQuery: e.target.value })}
-                autoFocus={showSearch}
-              />
-              <SearchResults
-                products={products} // Sử dụng products từ state
-                searchQuery={searchQuery}
-                onSelectProduct={(product) => {
-                  this.setState({
-                    selectedProduct: product,
-                    isModalOpen: true,
-                    searchQuery: '',
-                    showSearch: false
-                  });
-                }}
-                onCloseSearch={() => this.setState({ 
-                  showSearch: false,
-                  searchQuery: ''
-                })}
-                isVisible={showSearch}
-              />
+          <header className="header">
+            <div className="logo">
+              <RiXrpLine />
             </div>
 
-            <span className="icon search" onClick={this.toggleSearch}>
-              <SearchIcon style={{ color: "red" }} />
-            </span>
-            
-            {user ? (
-              <span className="icon user" onClick={this.toggleUserSidebar}>
-                <AccountCircleIcon style={{ color: "red" }} />
-              </span>
-            ) : (
-              <span className="icon login" onClick={this.toggleLogin}>
-                <AccountCircleIcon style={{ color: "red" }} />
-              </span>
-            )}
+            <div className="header-icons">
+              <div className={`search-input-container ${!showSearch ? 'hidden' : ''}`}>
+                <input 
+                  type="text" 
+                  placeholder="Tìm kiếm..."
+                  value={searchQuery}
+                  onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                  autoFocus={showSearch}
+                />
+                <SearchResults
+                  products={products} // Sử dụng products từ state
+                  searchQuery={searchQuery}
+                  onSelectProduct={(product) => {
+                    this.setState({
+                      selectedProduct: product,
+                      isModalOpen: true,
+                      searchQuery: '',
+                      showSearch: false
+                    });
+                  }}
+                  onCloseSearch={() => this.setState({ 
+                    showSearch: false,
+                    searchQuery: ''
+                  })}
+                  isVisible={showSearch}
+                />
+              </div>
 
-            <span className="icon cart" onClick={this.toggleCart}>
-              <ShoppingCartIcon style={{ color: "red" }} />
-              {cartItems.length > 0 && (
-                <span className="cart-badge">{cartItems.length}</span>
+              <span className="icon search" onClick={this.toggleSearch}>
+                <SearchIcon style={{ color: "red" }} />
+              </span>
+              
+              {user ? (
+                <span className="icon user" onClick={this.toggleUserSidebar}>
+                  <AccountCircleIcon style={{ color: "red" }} />
+                </span>
+              ) : (
+                <span className="icon login" onClick={this.toggleLogin}>
+                  <AccountCircleIcon style={{ color: "red" }} />
+                </span>
               )}
-            </span>
+
+              <span className="icon cart" onClick={this.toggleCart}>
+                <ShoppingCartIcon style={{ color: "red" }} />
+                {cartItems.length > 0 && (
+                  <span className="cart-badge">{cartItems.length}</span>
+                )}
+              </span>
+            </div>
+          </header>
+
+          <ProductPage 
+            onAddToCart={this.addToCart} 
+            ref={this.productPageRef} // Thêm dòng này
+          />
+
+          <div className={`login-signup-sidebar ${showLogin || showSignup ? 'active' : ''}`}>
+            <div className="form-toggle">
+              <button
+                className={`toggle-btn ${showLogin ? "active" : ""}`}
+                onClick={() => this.setState({ 
+                  showLogin: true, 
+                  showSignup: false,
+                  error: null 
+                })}
+              >
+                Login
+              </button>
+              <button
+                className={`toggle-btn ${showSignup ? "active" : ""}`}
+                onClick={() => this.setState({ 
+                  showSignup: true, 
+                  showLogin: false,
+                  error: null 
+                })}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            {showLogin && (
+              <LoginForm 
+                onClose={() => this.setState({ showLogin: false })}
+                onLoginSuccess={this.handleLoginSuccess}
+                onForgotPassword={() => this.setState({ 
+                  showLogin: false, 
+                  showForgotPassword: true 
+                })}
+              />
+            )}
+            
+            {showSignup && (
+              <SignupForm
+                onClose={() => this.setState({ showSignup: false })}
+                onSignupSuccess={this.handleSignupSuccess}
+              />
+            )}
           </div>
-        </header>
 
-        <ProductPage 
-          onAddToCart={this.addToCart} 
-          ref={this.productPageRef} // Thêm dòng này
-        />
-
-        <div className={`login-signup-sidebar ${showLogin || showSignup ? 'active' : ''}`}>
-          <div className="form-toggle">
-            <button
-              className={`toggle-btn ${showLogin ? "active" : ""}`}
-              onClick={() => this.setState({ 
-                showLogin: true, 
-                showSignup: false,
-                error: null 
-              })}
-            >
-              Login
-            </button>
-            <button
-              className={`toggle-btn ${showSignup ? "active" : ""}`}
-              onClick={() => this.setState({ 
-                showSignup: true, 
-                showLogin: false,
-                error: null 
-              })}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          {showLogin && (
-            <LoginForm 
-              onClose={() => this.setState({ showLogin: false })}
-              onLoginSuccess={this.handleLoginSuccess}
-              onForgotPassword={() => this.setState({ 
-                showLogin: false, 
-                showForgotPassword: true 
-              })}
-            />
+          {user && (
+            <div className={`sidebar-container ${showUserSidebar ? 'active' : ''}`}>
+              <UserSidebar
+                user={user}  // Truyền user info đầy đủ xuống
+                onClose={this.toggleUserSidebar}
+                onLogout={this.handleLogout}
+              />
+            </div>
           )}
-          
-          {showSignup && (
-            <SignupForm
-              onClose={() => this.setState({ showSignup: false })}
-              onSignupSuccess={this.handleSignupSuccess}
-            />
-          )}
-        </div>
 
-        {user && (
-          <div className={`sidebar-container ${showUserSidebar ? 'active' : ''}`}>
-            <UserSidebar
-              user={user}  // Truyền user info đầy đủ xuống
-              onClose={this.toggleUserSidebar}
-              onLogout={this.handleLogout}
+          <div className={`cart-sidebar ${showCart ? 'active' : ''}`}>
+            <Cart
+              cartItems={cartItems}
+              onClose={this.toggleCart}
+              onRemoveToCart={this.removeFromCart}
+              onUpdateCart={this.handleCartUpdate}
+              user={this.state.user}
+              onFetchCart={this.fetchCart}  // Thêm dòng này
             />
           </div>
-        )}
 
-        <div className={`cart-sidebar ${showCart ? 'active' : ''}`}>
-          <Cart
-            cartItems={cartItems}
-            onClose={this.toggleCart}
-            onRemoveToCart={this.removeFromCart}
-            onUpdateCart={this.handleCartUpdate}
-            user={this.state.user}
-            onFetchCart={this.fetchCart}  // Thêm dòng này
+          {showSessionExpiredModal && (
+            <SessionExpiredModal onClose={this.handleModalConfirm} />
+          )}
+
+          <ProductDetailModal
+            product={selectedProduct}
+            isOpen={isModalOpen}
+            onClose={() => this.setState({ 
+              isModalOpen: false,
+              selectedProduct: null 
+            })}
+            onAddToCart={this.addToCart} // Use this.addToCart instead of this.props.onAddToCart
           />
         </div>
-
-        {showSessionExpiredModal && (
-          <SessionExpiredModal onClose={this.handleModalConfirm} />
-        )}
-
-        <ProductDetailModal
-          product={selectedProduct}
-          isOpen={isModalOpen}
-          onClose={() => this.setState({ 
-            isModalOpen: false,
-            selectedProduct: null 
-          })}
-          onAddToCart={this.addToCart} // Use this.addToCart instead of this.props.onAddToCart
-        />
-      </div>
+      </ResponsiveWrapper>
     );
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
-import './UserSidebar.scss';
+import "../../styles/desktop/UserSidebar.scss"
 
 class UserSidebar extends Component {
   state = {

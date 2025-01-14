@@ -79,6 +79,12 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
     }
   }, [cartItems]);
 
+  useEffect(() => {
+    // Reset error and coupon input when cart opens/closes
+    setCouponError('');
+    setCouponCode('');
+  }, [onClose]); // Dependency on onClose means this runs when cart opens/closes
+
   const updateQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
     try {
@@ -210,6 +216,13 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
     return Math.max(0, originalTotal - promotionDiscount - couponDiscount);
   };
 
+  const handleClose = () => {
+    // Clear states before closing
+    setCouponError('');
+    setCouponCode('');
+    onClose();
+  };
+
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       setCouponError('Vui lòng nhập mã giảm giá');
@@ -279,9 +292,9 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
         <div className="cart-header">
           <h2>
             <ShoppingCartIcon className="cart-icon" />
-            Sản phẩm: {itemsWithPromotions.length}
-            <button className="close-cart" onClick={onClose}>×</button>
-          </h2>        
+            Sản phẩm: {cartItems.length}
+            <button className="close-cart" onClick={handleClose}>×</button>
+          </h2>
         </div>
 
         {itemsWithPromotions.length === 0 ? (

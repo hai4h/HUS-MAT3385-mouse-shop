@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../services/axiosConfig';
-import './CheckoutModal.scss'
+import '../../../styles/desktop/CheckoutModal.scss'
 
 const CheckoutModal = ({ 
   isOpen, 
@@ -262,7 +262,6 @@ const CheckoutModal = ({
                         value={shippingInfo.address}
                         onChange={handleInputChange}
                         placeholder="Nhập địa chỉ giao hàng"
-                        rows="3"
                       />
                     </div>
                   </div>
@@ -275,7 +274,6 @@ const CheckoutModal = ({
                     value={shippingInfo.note}
                     onChange={handleInputChange}
                     placeholder="Ghi chú thêm (không bắt buộc)"
-                    rows="2"
                   />
                 </div>
               </div>

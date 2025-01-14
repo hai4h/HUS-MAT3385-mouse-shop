@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from src.api.v1.endpoints import (
     auth, carts, users, products, reviews, orders,
-    images, promotions, warranties, coupons
+    images, promotions, warranties, coupons, page_views
 )
 
 api_router = APIRouter()
@@ -16,3 +16,4 @@ api_router.include_router(images.router, prefix="/images", tags=["images"])
 api_router.include_router(promotions.router, prefix="/promotions", tags=["promotions"])
 api_router.include_router(warranties.router, prefix="/warranties", tags=["warranties"])
 api_router.include_router(coupons.router, prefix="/coupons", tags=["coupons"])
+api_router.include_router(page_views.router, prefix="/page-views", tags=["page-views"])
