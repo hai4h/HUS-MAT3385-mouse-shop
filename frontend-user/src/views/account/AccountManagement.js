@@ -31,6 +31,7 @@ const AccountManagement = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [cancelLoading, setCancelLoading] = useState(false);
+    const [orderDetailsMap, setOrderDetailsMap] = useState({});
     const [formData, setFormData] = useState({
         email: '',
         full_name: '',
@@ -50,6 +51,23 @@ const AccountManagement = () => {
             }
         }
     }, [activeTab, showSessionExpiredModal]);
+
+    useEffect(() => {
+        const loadOrderDetails = async () => {
+            if (orders.length > 0) {
+                const detailsMap = {};
+                for (const order of orders.filter(o => o.status === 'delivered')) {
+                    const details = await fetchOrderDetails(order.order_id);
+                    if (details) {
+                        detailsMap[order.order_id] = details;
+                    }
+                }
+                setOrderDetailsMap(detailsMap);
+            }
+        };
+        
+        loadOrderDetails();
+    }, [orders]);
 
     useEffect(() => {
         let tokenCheckInterval;
@@ -176,6 +194,60 @@ const AccountManagement = () => {
             setOrders(response.data);
         } catch (error) {
             console.error('Error:', error);
+        }
+    };
+
+    const fetchOrderDetails = async (orderId) => {
+        try {
+          // Lấy thông tin order details
+          const response = await axiosInstance.get(`/orders/details/${orderId}`);
+          const details = response.data;
+      
+          // Lấy thông tin reviews cho từng product
+          const detailsWithReviews = await Promise.all(
+            details.map(async (detail) => {
+              try {
+                const reviewResponse = await axiosInstance.get(`/reviews/product/${detail.product_id}/reviews`);
+                const reviews = reviewResponse.data;
+                // Kiểm tra xem user hiện tại đã review chưa
+                const hasReviewed = reviews.user_reviews.some(
+                  review => review.order_detail_id === detail.order_detail_id
+                );
+                const wasEdited = hasReviewed ? reviews.user_reviews.find(
+                  review => review.order_detail_id === detail.order_detail_id
+                ).updated_at !== reviews.user_reviews.find(
+                  review => review.order_detail_id === detail.order_detail_id
+                ).created_at : false;
+      
+                return {
+                    ...detail,
+                    hasReviewed,
+                    wasEdited,
+                    review: hasReviewed ? {
+                        ...reviews.user_reviews.find(
+                            review => review.order_detail_id === detail.order_detail_id
+                        ),
+                        review_id: reviews.user_reviews.find(
+                            review => review.order_detail_id === detail.order_detail_id
+                        ).review_id
+                    } : null
+                };
+              } catch (error) {
+                console.error('Error fetching reviews:', error);
+                return {
+                  ...detail,
+                  hasReviewed: false,
+                  wasEdited: false,
+                  review: null
+                };
+              }
+            })
+          );
+      
+          return detailsWithReviews;
+        } catch (error) {
+          console.error('Error fetching order details:', error);
+          return null;
         }
     };
 
@@ -434,6 +506,12 @@ const AccountManagement = () => {
             <>
                 <div className="card-header">
                     <h1 className="section-title">Thông tin cá nhân</h1>
+                    <button
+                        className="home-button"
+                        onClick={() => navigate('/')}
+                    >
+                        <RiHome9Line />
+                    </button>
                 </div>
                 <div className="card-body">
                     <div className="profile-section">
@@ -521,16 +599,49 @@ const AccountManagement = () => {
                                         
                                         {order.status === 'delivered' && (
                                             <button
-                                                onClick={() => {
-                                                    setSelectedOrder({
-                                                        order_id: order.order_id,
-                                                        product_name: order.products // Tên sản phẩm từ order
-                                                    });
-                                                    setShowReviewModal(true);
+                                                onClick={async () => {
+                                                    const orderDetails = await fetchOrderDetails(order.order_id);
+                                                    if (orderDetails) {
+                                                        setOrderDetailsMap(prev => ({
+                                                            ...prev,
+                                                            [order.order_id]: orderDetails
+                                                        }));
+                                                        
+                                                        // Nếu tất cả sản phẩm đã được đánh giá và đã chỉnh sửa
+                                                        const allReviewedAndEdited = orderDetails.every(detail => 
+                                                            detail.hasReviewed && detail.wasEdited
+                                                        );
+                                                        
+                                                        if (!allReviewedAndEdited) {
+                                                            setSelectedOrder({
+                                                                order_id: order.order_id,
+                                                                products: order.products,
+                                                                product_details: orderDetails
+                                                            });
+                                                            setShowReviewModal(true);
+                                                        }
+                                                    }
                                                 }}
-                                                className="review-order-button"
+                                                className={`review-order-button ${
+                                                    orderDetailsMap[order.order_id]?.every(detail => 
+                                                        detail.hasReviewed && detail.wasEdited
+                                                    ) ? 'reviewed' : 
+                                                    orderDetailsMap[order.order_id]?.some(detail => 
+                                                        detail.hasReviewed
+                                                    ) ? 'edited' : ''
+                                                }`}
+                                                disabled={orderDetailsMap[order.order_id]?.every(detail => 
+                                                    detail.hasReviewed && detail.wasEdited
+                                                )}
                                             >
-                                                Đánh giá sản phẩm
+                                                {!orderDetailsMap[order.order_id] ? 'Đánh giá sản phẩm' :
+                                                orderDetailsMap[order.order_id].every(detail => 
+                                                    detail.hasReviewed && detail.wasEdited
+                                                ) ? 'Đã đánh giá' :
+                                                orderDetailsMap[order.order_id].some(detail => 
+                                                    detail.hasReviewed
+                                                ) ? 'Chỉnh sửa đánh giá' : 'Đánh giá sản phẩm'
+                                                }
                                             </button>
                                         )}
                                     </div>
@@ -548,7 +659,13 @@ const AccountManagement = () => {
                             setSelectedOrder(null);
                         }}
                         orderDetail={selectedOrder}
-                        onReviewSubmitted={() => {
+                        onReviewSubmitted={async () => {
+                            // Refresh order details
+                            const updatedDetails = await fetchOrderDetails(selectedOrder.order_id);
+                            setOrderDetailsMap(prev => ({
+                                ...prev,
+                                [selectedOrder.order_id]: updatedDetails
+                            }));
                             showToastMessage('Đã gửi đánh giá thành công');
                             fetchOrders();
                         }}
@@ -595,12 +712,7 @@ const AccountManagement = () => {
             )}
 
             <div className="sidebar">
-                <button
-                    className="home-button"
-                    onClick={() => navigate('/')}
-                >
-                    <RiHome9Line />
-                </button>
+                
 
                 <h2 className="nav-title">Quản lý tài khoản</h2>
                 <nav className="nav-menu">

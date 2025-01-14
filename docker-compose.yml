@@ -3,12 +3,14 @@ version: '3.8'
 services:
   frontend:
     build: 
-      context: ./frontend
+      context: ./frontend-user
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - app_network
 
   backend:
     build: 
@@ -17,7 +19,31 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_HOST=your_database_host
-      - DB_USER=your_database_user
-      - DB_PASSWORD=your_database_password
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=
       - DB_NAME=mouse_shop
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-container
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: mouse_shop
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/mysql/db/mouse_shop.sql:/docker-entrypoint-initdb.d/mouse_shop.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
+volumes:
+  mysql_data:

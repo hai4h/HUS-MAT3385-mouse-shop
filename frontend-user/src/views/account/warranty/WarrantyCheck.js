@@ -30,44 +30,42 @@ const WarrantyCheck = ({ user }) => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Reset states
       setSelectedOrder(null);
       setWarrantyDetails(null);
-
-      // Fetch order details
-      const orderResponse = await axiosInstance.get(`/orders/${orderId}`);
-      setSelectedOrder(orderResponse.data);
-
-      // Get warranty policies for products in the order
+  
+      const [orderResponse, orderDetailsResponse] = await Promise.all([
+        axiosInstance.get(`/orders/${orderId}`),
+        axiosInstance.get(`/orders/details/${orderId}`)
+      ]);
+  
       const orderDetails = orderResponse.data;
-      const productIds = orderDetails.products.split(',').map(p => p.trim());
-      
-      const warrantyPromises = productIds.map(async productId => {
-        try {
-          const response = await axiosInstance.get(`/warranties/policies/${productId}`);
-          const warrantyInfo = response.data;
-          
-          // Calculate warranty status for each product
-          const status = calculateWarrantyStatus(orderDetails.order_date, warrantyInfo.warranty_period);
-          
-          return {
-            productId,
-            warrantyInfo,
-            status
-          };
-        } catch (error) {
-          return {
-            productId,
-            warrantyInfo: null,
-            status: null
-          };
-        }
-      });
-
-      const warranties = await Promise.all(warrantyPromises);
+      const orderItems = orderDetailsResponse.data;
+  
+      const warranties = await Promise.all(
+        orderItems.map(async (item) => {
+          try {
+            const response = await axiosInstance.get(`/warranties/policies/${item.product_id}`);
+            return {
+              productId: item.product_id,
+              warrantyInfo: {
+                ...response.data,
+                product_name: item.product_name
+              },
+              status: calculateWarrantyStatus(orderDetails.order_date, response.data.warranty_period)
+            };
+          } catch (error) {
+            return {
+              productId: item.product_id,
+              warrantyInfo: null,
+              status: null,
+              product_name: item.product_name
+            };
+          }
+        })
+      );
+  
+      setSelectedOrder(orderDetails);
       setWarrantyDetails(warranties);
-
     } catch (error) {
       setError('Không thể tải thông tin bảo hành');
       console.error('Error fetching warranty details:', error);
@@ -130,63 +128,69 @@ const WarrantyCheck = ({ user }) => {
         {selectedOrder && warrantyDetails && (
           <div className="warranty-details-section">
             <h4 className="section-subtitle">Thông tin bảo hành</h4>
-              <div className="warranty-cards">
-                {warrantyDetails.map(({ productId, warrantyInfo, status }) => {
-                  return (
-                    <div key={productId} className="warranty-card">
-                      {warrantyInfo ? (
-                        <>
-                          <div className="warranty-header">
-                            <div className="product-info">
-                              <h5 className="product-name">{warrantyInfo.product_name}</h5>
-                              <p className="warranty-type">{warrantyInfo.warranty_type}</p>
-                            </div>
-                            <span className={`warranty-status ${status.isValid ? 'valid' : 'expired'}`}>
-                              {status.isValid ? 'Còn bảo hành' : 'Hết bảo hành'}
-                            </span>
-                          </div>
-                          
-                          <div className="warranty-details">
-                            <div className="detail-row">
-                              <span className="label">Thời hạn:</span>
-                              <span className="value">{warrantyInfo.warranty_period} tháng</span>
-                            </div>
-                            <div className="detail-row">
-                              <span className="label">Ngày hết hạn:</span>
-                              <span className="value">{status.endDate}</span>
-                            </div>
-                          </div>
+            <div className="warranty-cards">
+              {warrantyDetails.map(({ productId, warrantyInfo, status }, index) => (
+                <div key={`warranty-${productId}-${index}`} className="warranty-card">
+                  {warrantyInfo ? (
+                    <>
+                      <div className="warranty-header">
+                        <div className="product-info">
+                          <h5 className="product-name">{warrantyInfo.product_name}</h5>
+                          <p className="warranty-type">{warrantyInfo.warranty_type}</p>
+                        </div>
+                        <span className={`warranty-status ${status.isValid ? 'valid' : 'expired'}`}>
+                          {status.isValid ? 'Còn bảo hành' : 'Hết bảo hành'}
+                        </span>
+                      </div>
+                      
+                      <div className="warranty-details">
+                        <div className="detail-row">
+                          <span className="label">Thời hạn:</span>
+                          <span className="value">{warrantyInfo.warranty_period} tháng</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="label">Ngày hết hạn:</span>
+                          <span className="value">{status.endDate}</span>
+                        </div>
+                      </div>
 
-                          {warrantyInfo.warranty_conditions && (
-                            <div className="warranty-conditions">
-                              <p className="conditions-title">Điều kiện bảo hành:</p>
-                              <p className="conditions-content">{warrantyInfo.warranty_conditions}</p>
-                            </div>
-                          )}
-
-                          <div className="warranty-actions">
-                            <button 
-                              className={`warranty-button ${!status.isValid ? 'disabled' : ''}`}
-                              disabled={!status.isValid}
-                            >
-                              Yêu cầu bảo hành
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="warranty-header no-warranty">
-                          <div className="product-info">
-                            <h5 className="product-name">
-                              {selectedOrder.products.split(',')[warrantyDetails.indexOf({ productId, warrantyInfo, status })]}
-                            </h5>
-                            <p className="warranty-message">Sản phẩm chưa được kích hoạt bảo hành</p>
-                          </div>
+                      {warrantyInfo.warranty_conditions && (
+                        <div className="warranty-conditions">
+                          <p className="conditions-title">Điều kiện bảo hành:</p>
+                          <p className="conditions-content">{warrantyInfo.warranty_conditions}</p>
                         </div>
                       )}
+
+                      <div className="warranty-actions">
+                        <button 
+                          className={`warranty-button ${!status.isValid ? 'disabled' : ''}`}
+                          disabled={!status.isValid}
+                          onClick={() => {
+                            // Xử lý logic yêu cầu bảo hành ở đây
+                            if (status.isValid) {
+                              // Thực hiện hành động khi nút được click
+                              console.log('Yêu cầu bảo hành cho sản phẩm:', warrantyInfo.product_name);
+                            }
+                          }}
+                        >
+                          Yêu cầu bảo hành
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    // Trường hợp không có thông tin bảo hành
+                    <div className="warranty-header no-warranty">
+                      <div className="product-info">
+                        <h5 className="product-name">
+                          {warrantyInfo?.product_name || 'Unknown Product'}
+                        </h5>
+                        <p className="warranty-message">Sản phẩm chưa được kích hoạt bảo hành</p>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

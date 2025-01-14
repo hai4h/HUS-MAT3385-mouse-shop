@@ -353,3 +353,38 @@ async def cancel_order(
     finally:
         cursor.close()
         conn.close()
+
+@router.get("/details/{order_id}", response_model=List[dict]) 
+async def get_order_details_by_order(
+    order_id: int,
+    current_user = Depends(get_current_user)
+):
+    """Get order details including product IDs for a specific order"""
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # First verify order belongs to user
+        cursor.execute(
+            """SELECT user_id FROM orders WHERE order_id = %s""", 
+            (order_id,)
+        )
+        order = cursor.fetchone()
+        
+        if not order or order['user_id'] != current_user['user_id']:
+            raise HTTPException(status_code=404, detail="Order not found")
+            
+        # Get order details with product info
+        cursor.execute(
+            """SELECT od.*, p.name as product_name 
+               FROM order_details od
+               JOIN products p ON od.product_id = p.product_id
+               WHERE od.order_id = %s""",
+            (order_id,)
+        )
+        details = cursor.fetchall()
+        
+        return details
+    finally:
+        cursor.close()
+        conn.close()

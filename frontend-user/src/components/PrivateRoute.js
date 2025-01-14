@@ -7,7 +7,7 @@ const PrivateRoute = ({ children }) => {
     
     if (!user || !user.access_token) {
         // Not logged in, redirect to login page
-        return <Navigate to="/login" />;
+        return <Navigate to="/" />;
     }
 
     return children;
