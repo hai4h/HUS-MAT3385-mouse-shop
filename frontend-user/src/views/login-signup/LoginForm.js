@@ -27,7 +27,7 @@ class LoginForm extends Component {
         const { username, password } = this.state;
     
         if (!username || !password) {
-            this.setState({ error: 'Please enter both username and password' });
+            this.setState({ error: 'Vui lòng nhập đầy đủ thông tin' });
             return;
         }
         
@@ -44,10 +44,31 @@ class LoginForm extends Component {
             }
             
         } catch (error) {
-            this.setState({
-                error: error.message || 'Login failed',
-                loading: false
-            });
+            // Kiểm tra nếu là lỗi từ server
+            if (error.response) {
+                // Lỗi 401 là do sai thông tin đăng nhập
+                if (error.response.status === 401) {
+                    this.setState({
+                        error: 'Tên đăng nhập hoặc mật khẩu không chính xác',
+                        loading: false,
+                        password: '' // Xóa mật khẩu để ngăn trình duyệt đề xuất lưu
+                    });
+                } else {
+                    // Các lỗi khác
+                    this.setState({
+                        error: error.response.data?.detail || 'Đăng nhập thất bại',
+                        loading: false,
+                        password: '' // Xóa mật khẩu để ngăn trình duyệt đề xuất lưu
+                    });
+                }
+            } else {
+                // Lỗi không phải từ server
+                this.setState({
+                    error: 'Không thể kết nối với máy chủ',
+                    loading: false,
+                    password: '' // Xóa mật khẩu để ngăn trình duyệt đề xuất lưu
+                });
+            }
         }
     };
 

@@ -28,13 +28,28 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     async (error) => {
-        if (error.response?.status === 401 && !isShowingModal) {
-            isShowingModal = true;
-            // Dispatch custom event
-            const event = new CustomEvent('sessionExpired');
-            window.dispatchEvent(event);
+        // Kiểm tra nguồn gốc của lỗi 401
+        if (error.response?.status === 401) {
+            // Nếu lỗi đến từ endpoint login, không kích hoạt session expired
+            const loginEndpoints = ['/token'];
+            const currentUrl = error.config?.url;
+            
+            if (loginEndpoints.some(endpoint => currentUrl && currentUrl.includes(endpoint))) {
+                // Trả về lỗi để component login có thể xử lý
+                return Promise.reject(error);
+            }
 
-            // Reject promise để dừng request
+            // Kiểm tra xem token đã hết hạn chưa
+            const currentUser = authService.getCurrentUser();
+            const isTokenExpired = !currentUser || authService.isTokenExpired();
+
+            if (!isShowingModal && isTokenExpired) {
+                isShowingModal = true;
+                // Dispatch custom event
+                const event = new CustomEvent('sessionExpired');
+                window.dispatchEvent(event);
+            }
+
             return Promise.reject(new Error('Session expired'));
         }
         return Promise.reject(error);

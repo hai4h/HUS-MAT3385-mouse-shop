@@ -47,10 +47,8 @@ class AuthService {
             }
             throw new Error('Invalid response from server');
         } catch (error) {
-            if (error.response?.status === 401) {
-                throw new Error('Invalid username or password');
-            }
-            throw new Error(error.response?.data?.detail || error.message || 'Login failed');
+            // Ném nguyên error để component login có thể xử lý chi tiết
+            throw error;
         }
     }
 
