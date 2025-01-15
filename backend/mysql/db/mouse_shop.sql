@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 14, 2025 at 04:50 PM
+-- Generation Time: Jan 15, 2025 at 11:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -76,7 +76,7 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
-(54, 1, 2, 1, '2025-01-14 10:53:46');
+(58, 1, 1, 1, '2025-01-15 10:30:07');
 
 -- --------------------------------------------------------
 
@@ -108,7 +108,7 @@ CREATE TABLE `coupons` (
 --
 
 INSERT INTO `coupons` (`coupon_id`, `code`, `name`, `description`, `discount_type`, `discount_value`, `min_order_value`, `max_discount_amount`, `start_date`, `end_date`, `total_usage_limit`, `user_usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 1, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04');
+(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04');
 
 -- --------------------------------------------------------
 
@@ -144,13 +144,6 @@ CREATE TABLE `coupon_usage_history` (
   `used_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `discount_amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `coupon_usage_history`
---
-
-INSERT INTO `coupon_usage_history` (`usage_id`, `coupon_id`, `user_id`, `order_id`, `used_at`, `discount_amount`) VALUES
-(1, 1, 2, 2, '2025-01-12 11:56:07', 12.00);
 
 -- --------------------------------------------------------
 
@@ -204,7 +197,9 @@ CREATE TABLE `orders` (
 
 INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `shipping_address`, `note`, `order_date`, `updated_at`, `promotion_id`, `discount_amount`, `coupon_id`, `coupon_discount`) VALUES
 (1, 1, 129.99, 'pending', '123 Main St, City, Country, 12345', NULL, '2025-01-05 09:04:34', '2025-01-05 09:04:34', NULL, 0.00, NULL, 0.00),
-(2, 2, 107.99, 'pending', 'Test User, 0123456789, So 7, Thien Quang', 'tét', '2025-01-12 11:56:07', '2025-01-12 11:56:07', 1, 30.00, 1, 12.00);
+(2, 2, 107.99, 'delivered', 'Test User, 0123456789, So 7, Thien Quang', 'tét', '2025-01-12 11:56:07', '2025-01-12 11:56:07', 1, 30.00, 1, 12.00),
+(3, 2, 207.98, 'delivered', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-14 16:52:47', '2025-01-14 16:52:47', 1, 32.00, NULL, 0.00),
+(4, 2, 79.99, 'pending', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-14 23:13:13', '2025-01-14 23:13:13', NULL, 0.00, NULL, 0.00);
 
 -- --------------------------------------------------------
 
@@ -227,7 +222,10 @@ CREATE TABLE `order_details` (
 
 INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `subtotal`) VALUES
 (1, 1, 1, 1, 129.99, 129.99),
-(2, 2, 2, 1, 149.99, 149.99);
+(2, 2, 2, 1, 149.99, 149.99),
+(3, 3, 3, 1, 159.99, 159.99),
+(4, 3, 4, 1, 79.99, 79.99),
+(5, 4, 4, 1, 79.99, 79.99);
 
 -- --------------------------------------------------------
 
@@ -250,24 +248,22 @@ CREATE TABLE `products` (
   `avg_expert_rating` decimal(3,2) DEFAULT NULL,
   `total_reviews` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `main_image` varchar(255) DEFAULT NULL,
+  `thumbnail_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`thumbnail_images`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_quantity`, `hand_size`, `grip_style`, `is_wireless`, `brand`, `is_active`, `avg_user_rating`, `avg_expert_rating`, `total_reviews`, `created_at`, `updated_at`) VALUES
-(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 96, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43'),
-(2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 46, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57'),
-(3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 39, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25'),
-(4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 28, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57'),
-(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15'),
-(6, 'Razer Viper Ultimate', 'Wireless gaming mouse with optical switches and 20K DPI sensor', 149.99, 25, 'medium', 'claw', 1, 'Razer', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
-(7, 'Zowie EC2', 'Ergonomic gaming mouse for medium to large hands', 69.99, 40, 'large', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
-(8, 'SteelSeries Rival 650', 'Wireless gaming mouse with dual sensor system and weight customization', 129.99, 15, 'large', 'palm', 1, 'SteelSeries', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
-(9, 'Logitech G305', 'Wireless gaming mouse with HERO sensor and long battery life', 59.99, 50, 'small', 'fingertip', 1, 'Logitech', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38'),
-(10, 'Glorious Model D', 'Lightweight ergonomic gaming mouse with honeycomb shell', 49.99, 30, 'medium', 'palm', 0, 'Glorious PC Gaming Race', 1, NULL, NULL, 0, '2025-01-14 15:48:38', '2025-01-14 15:48:38');
+INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_quantity`, `hand_size`, `grip_style`, `is_wireless`, `brand`, `is_active`, `avg_user_rating`, `avg_expert_rating`, `total_reviews`, `created_at`, `updated_at`, `main_image`, `thumbnail_images`) VALUES
+(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 96, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43', NULL, NULL),
+(2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 47, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57', NULL, NULL),
+(3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 38, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25', NULL, NULL),
+(4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 26, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57', NULL, NULL),
+(5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15', NULL, NULL),
+(6, 'Razer Viper V2 Pro', 'Wireless gaming mouse with advanced optical sensor and ultra-lightweight design', 159.99, 20, 'medium', 'claw', 1, 'Razer', 1, NULL, NULL, 0, '2025-01-14 15:56:57', '2025-01-14 15:56:57', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -282,6 +278,14 @@ CREATE TABLE `product_images` (
   `is_primary` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_images`
+--
+
+INSERT INTO `product_images` (`image_id`, `product_id`, `image_url`, `is_primary`, `created_at`) VALUES
+(1, 1, '/static/products/1/main.webp', 1, '2025-01-15 09:14:32'),
+(2, 1, '/static/products/1/thumb1.webp', 0, '2025-01-15 09:52:28');
 
 -- --------------------------------------------------------
 
@@ -358,7 +362,75 @@ INSERT INTO `product_views` (`view_id`, `product_id`, `session_id`, `viewed_at`)
 (33, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:42:24'),
 (34, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:16'),
 (35, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:28'),
-(36, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:53');
+(36, 1, '1736864067176-85mzn8s5g', '2025-01-14 15:43:53'),
+(37, 6, '1736864067176-85mzn8s5g', '2025-01-14 15:57:03'),
+(38, 4, '1736864067176-85mzn8s5g', '2025-01-14 17:11:54'),
+(39, 2, '1736864236968-fwo31h00s', '2025-01-14 22:42:38'),
+(40, 1, '1736864236968-fwo31h00s', '2025-01-14 22:42:41'),
+(41, 3, '1736864236968-fwo31h00s', '2025-01-14 22:42:43'),
+(42, 4, '1736864236968-fwo31h00s', '2025-01-14 22:42:44'),
+(43, 4, '1736864236968-fwo31h00s', '2025-01-14 22:42:47'),
+(44, 4, '1736864236968-fwo31h00s', '2025-01-14 22:42:48'),
+(45, 4, '1736864236968-fwo31h00s', '2025-01-14 22:42:50'),
+(46, 2, '1736864236968-fwo31h00s', '2025-01-14 23:10:44'),
+(47, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:29:32'),
+(48, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:31:58'),
+(49, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:39:14'),
+(50, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:39:24'),
+(51, 2, '1736864067176-85mzn8s5g', '2025-01-15 09:47:45'),
+(52, 4, '1736864067176-85mzn8s5g', '2025-01-15 09:47:47'),
+(53, 5, '1736864067176-85mzn8s5g', '2025-01-15 09:47:49'),
+(54, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:48:13'),
+(55, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:51:50'),
+(56, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:52:32'),
+(57, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:53:43'),
+(58, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:54:22'),
+(59, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:55:27'),
+(60, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:55:34'),
+(61, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:55:40'),
+(62, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:59:01'),
+(63, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:59:01'),
+(64, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:59:33'),
+(65, 1, '1736864067176-85mzn8s5g', '2025-01-15 09:59:33'),
+(66, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:00:21'),
+(67, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:05:09'),
+(68, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:14'),
+(69, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:22'),
+(70, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:24'),
+(71, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:33'),
+(72, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:33'),
+(73, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:06:35'),
+(74, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:12:14'),
+(75, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:12:14'),
+(76, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:13:00'),
+(77, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:13:22'),
+(78, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:13:37'),
+(79, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:13:37'),
+(80, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:13:42'),
+(81, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:14:19'),
+(82, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:14:23'),
+(83, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:15:56'),
+(84, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:09'),
+(85, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:09'),
+(86, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:26'),
+(87, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:40'),
+(88, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:43'),
+(89, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:17:59'),
+(90, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:18:01'),
+(91, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:18:08'),
+(92, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:18:11'),
+(93, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:18:13'),
+(94, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:18:26'),
+(95, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:19:38'),
+(96, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:19:38'),
+(97, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:27:44'),
+(98, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:28:10'),
+(99, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:28:15'),
+(100, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:28:20'),
+(101, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:26'),
+(102, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:28'),
+(103, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:32'),
+(104, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:52');
 
 -- --------------------------------------------------------
 
@@ -388,7 +460,7 @@ CREATE TABLE `promotions` (
 --
 
 INSERT INTO `promotions` (`promotion_id`, `name`, `description`, `discount_type`, `discount_value`, `start_date`, `end_date`, `min_order_value`, `max_discount_amount`, `usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 20.00, '2024-12-31 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 1, 1, '2025-01-09 17:05:55', '2025-01-09 17:05:55');
+(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 20.00, '2024-12-31 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 2, 1, '2025-01-09 17:05:55', '2025-01-09 17:05:55');
 
 -- --------------------------------------------------------
 
@@ -442,7 +514,8 @@ INSERT INTO `technical_specs` (`spec_id`, `product_id`, `dpi`, `weight_g`, `leng
 (2, 2, 25600, 63.00, 125.00, 63.50, 40.00, 'HERO 25K', 1000, 'Omron', 50000000, 'LIGHTSPEED Wireless', 70, 'USB-C', 0, 5, '5 onboard profiles'),
 (3, 3, 30000, 63.00, 128.00, 68.00, 44.00, 'Focus Pro 30K', 1000, 'Optical Gen-3', 90000000, 'HyperSpeed Wireless', 90, 'USB-C', 0, 6, '5 onboard profiles'),
 (4, 4, 3200, 73.00, 120.00, 64.00, 40.00, '3360', 1000, 'Huano', 20000000, 'Wired', 0, 'USB-C', 0, 5, 'No onboard memory'),
-(5, 5, 26000, 52.00, 114.00, 58.00, 36.00, 'PAW3395', 1000, 'Kailh 8.0', 80000000, '2.4GHz Wireless', 70, 'USB-C', 1, 6, '4 onboard profiles');
+(5, 5, 26000, 52.00, 114.00, 58.00, 36.00, 'PAW3395', 1000, 'Kailh 8.0', 80000000, '2.4GHz Wireless', 70, 'USB-C', 1, 6, '4 onboard profiles'),
+(11, 6, 30000, 58.00, 126.70, 57.60, 37.80, 'Optical', 1000, 'Optical Gen-3', 90000000, 'Wireless', 80, 'USB-C', 0, 5, '5');
 
 -- --------------------------------------------------------
 
@@ -486,7 +559,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `address`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'admintest', 'admin@example.com', '$2b$12$.4tn.sVnaxkxlxMhpXaURuVE0gBta5Z/aE7S7GIcDU0s19.cgZaLm', 'Hoang Dinh Hai Anh', NULL, NULL, 'admin', '2024-12-04 03:38:09', '2024-12-04 03:38:09'),
-(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 12:12:00');
+(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 12:12:00'),
+(3, 'testuser2', 'test2@example.eg', '$2b$12$WVwDUZBsSWiw2P8uZ52Rc.xRIcbOdPjPFrXacuLd5X.fB7F4uKH3q', 'Ko Co Ten', NULL, NULL, 'user', '2025-01-14 22:49:17', '2025-01-14 22:49:17');
 
 -- --------------------------------------------------------
 
@@ -531,7 +605,10 @@ CREATE TABLE `user_reviews` (
 --
 
 INSERT INTO `user_reviews` (`review_id`, `order_detail_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'dm logitech', '2025-01-05 09:05:18', '2025-01-05 09:05:18');
+(1, 1, 1, 'dm logitech', '2025-01-05 09:05:18', '2025-01-05 09:05:18'),
+(2, 2, 5, 'chay nhu do thai', '2025-01-14 21:31:29', '2025-01-14 21:31:29'),
+(3, 3, 1, 'vcl qua dien', '2025-01-14 21:32:34', '2025-01-14 21:32:34'),
+(4, 4, 2, '.....................', '2025-01-14 21:32:43', '2025-01-14 21:32:43');
 
 -- --------------------------------------------------------
 
@@ -642,7 +719,8 @@ ALTER TABLE `order_details`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`product_id`),
-  ADD KEY `idx_products_brand` (`brand`);
+  ADD KEY `idx_products_brand` (`brand`),
+  ADD KEY `idx_products_main_image` (`main_image`);
 
 --
 -- Indexes for table `product_images`
@@ -749,7 +827,7 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `coupons`
@@ -779,25 +857,25 @@ ALTER TABLE `expert_reviews`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `product_promotions`
@@ -809,7 +887,7 @@ ALTER TABLE `product_promotions`
 -- AUTO_INCREMENT for table `product_views`
 --
 ALTER TABLE `product_views`
-  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `promotions`
@@ -821,7 +899,7 @@ ALTER TABLE `promotions`
 -- AUTO_INCREMENT for table `technical_specs`
 --
 ALTER TABLE `technical_specs`
-  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `traffic_analytics`
@@ -833,7 +911,7 @@ ALTER TABLE `traffic_analytics`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `user_preferences`
@@ -845,7 +923,7 @@ ALTER TABLE `user_preferences`
 -- AUTO_INCREMENT for table `user_reviews`
 --
 ALTER TABLE `user_reviews`
-  MODIFY `review_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `review_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `warranty_claims`

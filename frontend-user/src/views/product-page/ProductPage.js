@@ -7,6 +7,7 @@ import axiosInstance from "../../services/axiosConfig";
 import ProductFilters from "./filters/ProductFilters";
 import ProductDetailModal from "./modals/ProductDetailModal";
 import MobileProductFilters from "../mobile/MobileProductFilters";
+import ProductImage from "../../components/ProductImage";
 
 class ProductPage extends Component {
   constructor(props) {
@@ -282,7 +283,7 @@ class ProductPage extends Component {
     } = this.state;
 
     if (loading) {
-      return <div className="loading">Loading products...</div>;
+      return <div className="loading">Đang tải sản phẩm...</div>;
     }
 
     if (error) {
@@ -332,7 +333,10 @@ class ProductPage extends Component {
               </div>
 
               <div className="product-image">
-                {/* Placeholder for product image */}
+                <ProductImage
+                  mainImage={product.main_image || `/static/products/${product.product_id}/main.jpg`}
+                  alt={product.name}
+                />
                 {product.hasPromotion && (
                   <span className="discount-badge">
                     -{product.discountPercentage}%

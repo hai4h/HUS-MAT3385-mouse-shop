@@ -182,7 +182,7 @@ const WarrantyCheck = ({ user }) => {
                     <div className="warranty-header no-warranty">
                       <div className="product-info">
                         <h5 className="product-name">
-                          {warrantyInfo?.product_name || 'Unknown Product'}
+                          {warrantyInfo?.product_name || 'Không tìm thấy thông tin'}
                         </h5>
                         <p className="warranty-message">Sản phẩm chưa được kích hoạt bảo hành</p>
                       </div>

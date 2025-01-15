@@ -85,7 +85,7 @@ async def add_to_cart(
         cursor.close()
         conn.close()
 
-@router.get("/cart", response_model=Cart)
+@router.get("/", response_model=Cart)
 async def get_cart(current_user: dict = Depends(get_current_user)):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

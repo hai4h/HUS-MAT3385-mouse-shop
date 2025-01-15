@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../../styles/desktop/ProductDetailModal.scss";
 import axiosInstance from '../../../services/axiosConfig';
 import { TrackProductView } from '../../../components/TrackProductView';
+import ProductImage from '../../../components/ProductImage';
 
 const NoImagePlaceholder = () => (
   <div className="no-image-placeholder">
@@ -53,30 +54,43 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
     }
   };
 
-  const fetchImages = async () => {
-    try {
-      const response = await axiosInstance.get(`/images/product/${product.product_id}`);
-      setProductImages(response.data.thumbnails || []);
-      setSelectedImage(response.data.primary_image || response.data.thumbnails[0] || null);
-    } catch (error) {
-      console.error('Error fetching images:', error);
-      setProductImages([]);
-      setSelectedImage(null);
-    }
-  };
-
   useEffect(() => {
     if (isOpen && product) {
       TrackProductView(product.product_id);
       setIsActive(true);
       fetchTechnicalSpecs();
       fetchReviews();
-      fetchImages();
+      fetchImages(); // Thay thế phần mock images
     } else {
       setIsActive(false);
-      setQuantity(1); // Reset quantity when modal closes
+      setQuantity(1);
+      setSelectedImage(null);
+      setProductImages([]);
     }
   }, [isOpen, product]);
+  
+  const fetchImages = async () => {
+    try {
+      const response = await axiosInstance.get(`/images/product/${product.product_id}`);
+      
+      // Lưu toàn bộ ảnh thumbnails
+      const thumbnails = response.data.thumbnails || [];
+      
+      // Nếu có ảnh chính, thêm vào đầu mảng thumbnails
+      if (response.data.primary_image) {
+        thumbnails.unshift(response.data.primary_image);
+      }
+  
+      setProductImages(thumbnails);
+      
+      // Chọn ảnh đầu tiên làm ảnh được chọn
+      setSelectedImage(thumbnails[0] || null);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      setProductImages([]);
+      setSelectedImage(null);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -106,7 +120,14 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
   };
 
   const handleThumbnailClick = (image) => {
-    setSelectedImage(image);
+    // Toggle selection if clicking the same image
+    if (selectedImage?.image_id === image.image_id) {
+      // If clicking active thumbnail, switch back to main image
+      const mainImage = productImages.find(img => img.is_primary);
+      setSelectedImage(mainImage);
+    } else {
+      setSelectedImage(image);
+    }
   };
 
   if (!isOpen || !product) return null;
@@ -127,14 +148,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
           <div className="product-details">
             <div className="image-gallery">
               <div className="main-image">
-                {selectedImage ? (
-                  <img 
-                    src={selectedImage.image_url} 
-                    alt={product.name}
-                  />
-                ) : (
-                  <NoImagePlaceholder />
-                )}
+                <ProductImage
+                  mainImage={selectedImage?.image_url}
+                  alt={product?.name}
+                />
               </div>
               <div className="thumbnails">
                 {productImages.length > 0 ? (
@@ -144,9 +161,9 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                       className={`thumbnail ${selectedImage?.image_id === image.image_id ? 'active' : ''}`}
                       onClick={() => handleThumbnailClick(image)}
                     >
-                      <img 
-                        src={image.image_url} 
-                        alt={`${product.name} thumbnail`}
+                      <ProductImage
+                        mainImage={image.image_url}
+                        alt={`${product?.name} thumbnail`}
                       />
                     </div>
                   ))
@@ -154,7 +171,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                   <ThumbnailPlaceholder />
                 )}
               </div>
-            </div>
+          </div>
 
             <div className="product-info">
               <h2 className="product-title">{product.name}</h2>

@@ -544,6 +544,12 @@ const AccountManagement = () => {
             <>
                 <div className="card-header">
                     <h1 className="section-title">Đơn hàng của tôi</h1>
+                    <button
+                        className="home-button"
+                        onClick={() => navigate('/')}
+                    >
+                        <RiHome9Line />
+                    </button>
                 </div>
                 <div className="card-body">
                     {orders.length === 0 ? (
@@ -680,6 +686,12 @@ const AccountManagement = () => {
             <>
                 <div className="card-header">
                     <h1 className="section-title">Bảo hành</h1>
+                    <button
+                        className="home-button"
+                        onClick={() => navigate('/')}
+                    >
+                        <RiHome9Line />
+                    </button>
                 </div>
                 <div className="card-body">
                     <WarrantyCheck user={userInfo} />

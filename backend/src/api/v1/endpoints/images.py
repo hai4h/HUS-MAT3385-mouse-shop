@@ -1,10 +1,58 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from typing import List, Optional
+import os
+import shutil
 from src.core.security import get_current_user
 from src.db.database import get_db_connection
 from src.models.schemas.image import ImageCreate, ImageResponse, ProductImages
 
 router = APIRouter()
+
+# Constants
+UPLOAD_DIR = os.path.join("static", "products")
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+def validate_image(file: UploadFile) -> bool:
+    # Check file extension
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type not allowed. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+    
+    # Check file size
+    file.file.seek(0, 2)  # Seek to end
+    size = file.file.tell()
+    file.file.seek(0)  # Reset file pointer
+    
+    if size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File size exceeds maximum limit of {MAX_FILE_SIZE/1024/1024}MB"
+        )
+    
+    return True
+
+def save_image(file: UploadFile, product_id: int, is_primary: bool = False) -> str:
+    """Save image file and return the relative path"""
+    # Create product directory if it doesn't exist
+    product_dir = os.path.join(UPLOAD_DIR, str(product_id))
+    os.makedirs(product_dir, exist_ok=True)
+    
+    # Generate filename
+    ext = os.path.splitext(file.filename)[1].lower()
+    filename = f"main{ext}" if is_primary else f"thumb_{file.filename}"
+    file_path = os.path.join(product_dir, filename)
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return os.path.join("/static/products", str(product_id), filename)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
 
 @router.get("/product/{product_id}", response_model=ProductImages)
 async def get_product_images(product_id: int):
@@ -54,6 +102,9 @@ async def upload_product_image(
     """Upload a new product image (admin only)"""
     if current_user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admins can upload images")
+    
+    # Validate image
+    validate_image(file)
         
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -75,17 +126,16 @@ async def upload_product_image(
                    WHERE product_id = %s AND is_primary = TRUE""",
                 (product_id,)
             )
-
-        # Save file and get URL (implement your file storage logic here)
-        # For example, save to local storage or cloud storage
-        file_url = f"/images/products/{product_id}/{file.filename}"  # Example URL
+            
+        # Save file and get URL
+        image_url = save_image(file, product_id, is_primary)
         
         # Insert image record
         cursor.execute(
             """INSERT INTO product_images 
                (product_id, image_url, is_primary) 
                VALUES (%s, %s, %s)""",
-            (product_id, file_url, is_primary)
+            (product_id, image_url, is_primary)
         )
         
         conn.commit()
@@ -115,7 +165,7 @@ async def delete_product_image(
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Check if image exists
+        # Get image info
         cursor.execute(
             "SELECT * FROM product_images WHERE image_id = %s",
             (image_id,)
@@ -125,15 +175,18 @@ async def delete_product_image(
         if not image:
             raise HTTPException(status_code=404, detail="Image not found")
             
-        # Delete image
+        # Delete file from filesystem
+        file_path = os.path.join(os.getcwd(), image['image_url'].lstrip('/'))
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        # Delete database record
         cursor.execute(
             "DELETE FROM product_images WHERE image_id = %s",
             (image_id,)
         )
         
         conn.commit()
-        
-        # Implement file deletion from storage here
         
         return {"message": "Image deleted successfully"}
         

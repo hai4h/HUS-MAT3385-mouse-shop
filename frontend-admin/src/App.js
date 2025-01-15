@@ -1,34 +1,24 @@
-// App.js
-import React from "react";
-import "./App.css";
-import { ThemeProvider } from '@mui/material/styles'
-import { CssBaseline } from '@mui/material';
-import theme from "./Theme";
-import AppRoute from "./Route/Route";
-import SessionTimeoutDialog from './components/auth/SessionTimeoutDialog';
-import { useAdminAuth } from './hooks/useAdminAuth';
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
-  const { showSessionTimeout, setShowSessionTimeout } = useAdminAuth();
-
-  const handleConfirmLogout = () => {
-    setShowSessionTimeout(false);
-    localStorage.removeItem('adminUser');
-    window.location.href = 'http://localhost:3000?adminLogout=true';
-  };
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div className="App">
-        <AppRoute />
-        <SessionTimeoutDialog 
-          open={showSessionTimeout}
-          onClose={() => setShowSessionTimeout(false)}
-          onConfirm={handleConfirmLogout}
-        />
-      </div>
-    </ThemeProvider>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
   );
 }
 

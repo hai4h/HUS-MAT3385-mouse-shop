@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './Toast.scss';
+import '../../styles/desktop/Toast.scss';
 
 const Toast = ({ message, isVisible, onHide }) => {
   useEffect(() => {

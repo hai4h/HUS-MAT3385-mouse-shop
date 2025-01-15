@@ -47,6 +47,8 @@ class MyComponent extends Component {
     this.handleSessionExpired = this.handleSessionExpired.bind(this);
   }
 
+  
+
   loadCompleteUserData = async () => {
     const currentUser = authService.getCurrentUser();
     
@@ -133,6 +135,7 @@ class MyComponent extends Component {
     window.removeEventListener('focus', this.checkAndUpdateUserAuth);
     window.removeEventListener('sessionExpired', this.handleSessionExpired);
     document.removeEventListener('click', this.handleDocumentClick);
+    document.body.classList.remove('cart-open');
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -228,8 +231,17 @@ class MyComponent extends Component {
   };
 
   toggleCart = () => {
+    const newCartState = !this.state.showCart;
+    
+    // Thêm hoặc xóa class 'cart-open' trên body
+    if (newCartState) {
+      document.body.classList.add('cart-open');
+    } else {
+      document.body.classList.remove('cart-open');
+    }
+  
     this.setState(prevState => ({
-      showCart: !prevState.showCart,
+      showCart: newCartState,
       showSearch: false,
       showLogin: false,
       showSignup: false,
@@ -447,7 +459,7 @@ class MyComponent extends Component {
     }
   
     try {
-      const response = await axiosInstance.get('/cart/cart');
+      const response = await axiosInstance.get('/cart');
       const cartItems = response.data.items || [];
       
       if (JSON.stringify(cartItems) !== JSON.stringify(this.state.cartItems)) {

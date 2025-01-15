@@ -109,7 +109,7 @@
       }
 
       .card-body {
-        padding: 2rem;
+        padding: 1.5rem;
         max-height: 80vh; // Giới hạn chiều cao
 
         .profile-section {
@@ -220,7 +220,6 @@
       border-radius: 8px;
       padding: 1.5rem;
       max-width: 100%; // Đảm bảo không vượt quá container
-      overflow: hidden; // Ngăn nội dung tràn ra ngoài
 
       .order-header {
           display: flex;

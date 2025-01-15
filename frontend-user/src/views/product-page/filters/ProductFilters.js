@@ -90,7 +90,7 @@ const ProductFilters = ({
       )}
 
       {/* Stock Filter */}
-      <div className="filter-section">
+      {/* <div className="filter-section">
         <h3>Tình trạng</h3>
         <label className="checkbox-label">
           <input
@@ -100,7 +100,7 @@ const ProductFilters = ({
           />
           <span className="checkbox-text">Còn hàng</span>
         </label>
-      </div>
+      </div> */}
 
       {/* Price Range Filter */}
       <div className="filter-section">

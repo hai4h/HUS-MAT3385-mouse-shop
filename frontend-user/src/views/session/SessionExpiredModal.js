@@ -1,6 +1,6 @@
 // SessionExpiredModal.js
 import React from 'react';
-import './SessionExpiredModal.scss';
+import '../../styles/desktop/SessionExpiredModal.scss';
 
 const SessionExpiredModal = ({ onClose }) => {
   console.log('Rendering SessionExpiredModal');

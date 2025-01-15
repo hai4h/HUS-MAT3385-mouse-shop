@@ -31,7 +31,7 @@ class AuthService {
                         username: response.data.username,
                         role: response.data.role
                     }).toString();
-                    window.location.href = `http://localhost:3001?${params}`;
+                    window.location.href = `http://0.0.0.0:3001?${params}`;
                     return null;
                 }
 

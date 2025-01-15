@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import axiosInstance from '../../services/axiosConfig';
 import CheckoutModal from './checkout/CheckoutModal';
+import ProductImage from '../../components/ProductImage';
 
 const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchCart }) => {
   const [couponCode, setCouponCode] = useState('');
@@ -10,6 +11,7 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
   const [itemsWithPromotions, setItemsWithPromotions] = useState([]);
   const [couponRestrictions, setCouponRestrictions] = useState(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [productImages, setProductImages] = useState({});
   
   useEffect(() => {
     const fetchPromotionsAndProducts = async () => {
@@ -76,6 +78,33 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
       fetchPromotionsAndProducts();
     } else {
       setItemsWithPromotions([]);
+    }
+  }, [cartItems]);
+
+  useEffect(() => {
+    const fetchProductImages = async () => {
+      const imagePromises = cartItems.map(async (item) => {
+        try {
+          const response = await axiosInstance.get(`/images/product/${item.product_id}`);
+          return {
+            [item.product_id]: {
+              main: response.data.primary_image?.image_url || null,
+              thumbnails: response.data.thumbnails || []
+            }
+          };
+        } catch (error) {
+          console.error(`Error fetching images for product ${item.product_id}:`, error);
+          return { [item.product_id]: { main: null, thumbnails: [] } };
+        }
+      });
+
+      const imageResults = await Promise.all(imagePromises);
+      const imagesMap = imageResults.reduce((acc, curr) => ({...acc, ...curr}), {});
+      setProductImages(imagesMap);
+    };
+
+    if (cartItems.length > 0) {
+      fetchProductImages();
     }
   }, [cartItems]);
 
@@ -220,6 +249,7 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
     // Clear states before closing
     setCouponError('');
     setCouponCode('');
+    document.body.classList.remove('cart-open');
     onClose();
   };
 
@@ -304,11 +334,16 @@ const Cart = ({ cartItems, onClose, onRemoveToCart, onUpdateCart, user, onFetchC
             {itemsWithPromotions.map((item) => {
               const finalPrice = calculateItemFinalPrice(item);
               const isCouponEligible = isProductEligibleForCoupon(item);
+              const productImage = productImages[item.product_id]?.main;
               
               return (
                 <li key={item.cart_item_id} className="cart-item">
                   <div className="item-image">
-                    <img src="/api/placeholder/60/60" alt={item.name} />
+                    <ProductImage 
+                      mainImage={productImage}
+                      alt={item.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   
                   <div className="item-details">

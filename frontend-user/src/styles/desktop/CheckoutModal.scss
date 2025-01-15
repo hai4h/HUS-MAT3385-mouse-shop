@@ -71,7 +71,7 @@
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
   width: 90%;
-  max-width: 800px;
+  max-width: 80vw;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -89,13 +89,13 @@
   .checkout-modal-content {
     position: relative;
     padding: 2rem;
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
 
     .close-button {
-      position: absolute;
+      position: fixed;
       top: 1rem;
-      right: 1rem;
+      left: 1rem;
       background: none;
       border: none;
       font-size: 2rem;
@@ -127,7 +127,7 @@
         &:not(:last-child)::after {
           content: '';
           position: absolute;
-          top: 1rem;
+          top: 2vh;
           left: 60%;
           width: 80%;
           height: 2px;
@@ -139,13 +139,13 @@
           color: #333;
 
           .step-number {
-            background: #4CAF50;
+            background: #ff2600;
             color: white;
-            border-color: #4CAF50;
+            border-color: #ff2600;
           }
 
           &:not(:last-child)::after {
-            background: #4CAF50;
+            background: #ff2600;
           }
         }
 

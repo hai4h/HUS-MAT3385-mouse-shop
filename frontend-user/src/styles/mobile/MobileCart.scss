@@ -4,7 +4,7 @@
 @include mobile {
   // Override desktop cart styles for mobile
   .cart-sidebar {
-    width: 100vw;
+    width: 100%;
     position: fixed;
     top: 0;
     right: -100%;
@@ -82,14 +82,14 @@
       }
 
       .cart-bottom {
-        position: fixed;
+        position: sticky;
         bottom: 0;
         left: 0;
         right: 0;
         background: $background-color;
         padding-bottom: 4rem; // Space for bottom navigation
         box-shadow: $shadow-medium;
-        
+        width: 100%;        
 
         .discount-form {
           display: flex;

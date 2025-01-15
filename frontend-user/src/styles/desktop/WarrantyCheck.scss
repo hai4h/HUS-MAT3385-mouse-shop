@@ -41,7 +41,6 @@
     overflow: hidden;
     background: white;
     border-radius: 0.5rem;
-    padding: 1.5rem;
 
     .orders-section {
       margin-bottom: 1rem;
@@ -90,7 +89,7 @@
     }
 
     .warranty-details-section {
-      margin-top: 2rem;
+      margin-top: 0;
       flex: 1;
       overflow-y: auto;
       padding: 1rem;

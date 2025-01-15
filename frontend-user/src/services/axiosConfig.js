@@ -2,7 +2,7 @@ import axios from 'axios';
 import authService from './authService';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: 'http://0.0.0.0:8000',
     headers: {
         'Content-Type': 'application/json'
     }

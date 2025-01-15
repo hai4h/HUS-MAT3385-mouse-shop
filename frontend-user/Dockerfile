@@ -1,5 +1,5 @@
 # Frontend Dockerfile
-FROM node:20 AS build
+FROM node:20-alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -16,8 +16,8 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Expose port 80
-EXPOSE 80
+# Expose port 3000
+EXPOSE 3000
 
 # Chạy ứng dụng frontend
 CMD ["npm", "start"]

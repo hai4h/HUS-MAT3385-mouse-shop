@@ -2,9 +2,40 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../services/axiosConfig';
 import '../../../styles/desktop/CheckoutModal.scss'
 
+const StepsIndicator = ({ currentStep }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const steps = [
+    'Xác nhận đơn hàng',
+    'Thông tin vận chuyển',
+    'Hoàn tất'
+  ];
+
+  return (
+    <div className="steps-indicator">
+      {steps.map((stepText, index) => (
+        <div key={index} className={`step ${currentStep >= index + 1 ? 'active' : ''}`}>
+          <div className="step-number">{index + 1}</div>
+          {/* Chỉ hiển thị text khi không phải mobile hoặc là step hiện tại */}
+          {(!isMobile || currentStep === index + 1) && <span>{stepText}</span>}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const CheckoutModal = ({ 
   isOpen, 
-  onClose, 
+  onClose,
   cartItems, 
   appliedCoupon,
   originalTotal,
@@ -137,20 +168,7 @@ const CheckoutModal = ({
         <div className="checkout-modal-content">
           <button className="close-button" onClick={onClose}>×</button>
           
-          <div className="steps-indicator">
-            <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
-              <div className="step-number">1</div>
-              <span>Xác nhận đơn hàng</span>
-            </div>
-            <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
-              <div className="step-number">2</div>
-              <span>Thông tin vận chuyển</span>
-            </div>
-            <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>
-              <div className="step-number">3</div>
-              <span>Hoàn tất</span>
-            </div>
-          </div>
+          <StepsIndicator currentStep={currentStep} />
 
           {error && <div className="error-message">{error}</div>}
 

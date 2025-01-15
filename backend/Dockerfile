@@ -1,25 +1,33 @@
-# Backend Dockerfile
+# Use an official Python runtime as a parent image
 FROM python:3.10-slim
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies required for MySQL
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    gcc \
+    default-libmysqlclient-dev \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file
+# Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code
+# Copy the rest of the application's code
 COPY . .
 
-# Expose port
+# Create static directory
+RUN mkdir -p static/products
+
+# Expose the port the app runs on
 EXPOSE 8000
 
+# Define environment variable to run in production
+ENV PYTHONUNBUFFERED=1
+
 # Run the application
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
