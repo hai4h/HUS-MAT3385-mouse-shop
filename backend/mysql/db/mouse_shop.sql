@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 15, 2025 at 07:26 PM
+-- Generation Time: Jan 16, 2025 at 02:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -60,9 +60,8 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
-(58, 1, 1, 1, '2025-01-15 10:30:07'),
-(59, 1, 4, 1, '2025-01-15 12:25:41'),
-(60, 1, 5, 1, '2025-01-15 14:42:08');
+(62, 1, 1, 1, '2025-01-16 01:15:29'),
+(63, 1, 4, 1, '2025-01-16 01:15:43');
 
 -- --------------------------------------------------------
 
@@ -94,7 +93,8 @@ CREATE TABLE `coupons` (
 --
 
 INSERT INTO `coupons` (`coupon_id`, `code`, `name`, `description`, `discount_type`, `discount_value`, `min_order_value`, `max_discount_amount`, `start_date`, `end_date`, `total_usage_limit`, `user_usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04');
+(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04'),
+(2, 'WELCOME2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-16 10:02:06', '2025-01-16 10:02:06');
 
 -- --------------------------------------------------------
 
@@ -114,7 +114,8 @@ CREATE TABLE `coupon_category_restrictions` (
 --
 
 INSERT INTO `coupon_category_restrictions` (`restriction_id`, `coupon_id`, `category`, `category_value`) VALUES
-(1, 1, 'brand', 'Logitech');
+(1, 1, 'brand', 'Logitech'),
+(2, 2, 'brand', 'Logitech');
 
 -- --------------------------------------------------------
 
@@ -249,7 +250,8 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_qua
 (3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 38, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25', NULL, NULL),
 (4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 26, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57', NULL, NULL),
 (5, 'Pulsar X2 Mini', 'Ultra-lightweight gaming mouse designed for small hands', 69.99, 23, 'small', 'fingertip', 1, 'Pulsar', 1, NULL, NULL, 0, '2024-12-18 08:48:05', '2024-12-18 13:12:15', NULL, NULL),
-(6, 'Razer Viper V2 Pro', 'Wireless gaming mouse with advanced optical sensor and ultra-lightweight design', 159.99, 20, 'medium', 'claw', 1, 'Razer', 1, NULL, NULL, 0, '2025-01-14 15:56:57', '2025-01-14 15:56:57', NULL, NULL);
+(6, 'Razer Viper V2 Pro', 'Wireless gaming mouse with advanced optical sensor and ultra-lightweight design', 159.99, 20, 'medium', 'claw', 1, 'Razer', 1, NULL, NULL, 0, '2025-01-14 15:56:57', '2025-01-14 15:56:57', NULL, NULL),
+(7, 'Waizowl OGM Cloud V2', 'Wireless Gaming Mouse perfect for those looking for a high-quality mouse with many features', 89.99, 15, 'large', 'claw', 1, 'Waizowl', 1, NULL, NULL, 0, '2025-01-16 11:01:37', '2025-01-16 11:01:37', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -421,7 +423,12 @@ INSERT INTO `product_views` (`view_id`, `product_id`, `session_id`, `viewed_at`)
 (106, 1, '1736943232094-rl74d1tew', '2025-01-15 13:54:34'),
 (107, 2, '1736943232094-rl74d1tew', '2025-01-15 13:55:43'),
 (108, 1, '1736943232094-rl74d1tew', '2025-01-15 13:55:56'),
-(109, 1, '1736943232094-rl74d1tew', '2025-01-15 14:10:58');
+(109, 1, '1736943232094-rl74d1tew', '2025-01-15 14:10:58'),
+(110, 1, '1736943232094-rl74d1tew', '2025-01-15 20:43:50'),
+(111, 1, '1736943232094-rl74d1tew', '2025-01-15 20:46:55'),
+(112, 2, '1736864067176-85mzn8s5g', '2025-01-16 01:14:39'),
+(113, 1, '1736943116478-5io6c8bcl', '2025-01-16 10:41:31'),
+(114, 1, '1736864067176-85mzn8s5g', '2025-01-16 10:49:31');
 
 -- --------------------------------------------------------
 
@@ -506,7 +513,8 @@ INSERT INTO `technical_specs` (`spec_id`, `product_id`, `dpi`, `weight_g`, `leng
 (3, 3, 30000, 63.00, 128.00, 68.00, 44.00, 'Focus Pro 30K', 1000, 'Optical Gen-3', 90000000, 'HyperSpeed Wireless', 90, 'USB-C', 0, 6, '5 onboard profiles'),
 (4, 4, 3200, 73.00, 120.00, 64.00, 40.00, '3360', 1000, 'Huano', 20000000, 'Wired', 0, 'USB-C', 0, 5, 'No onboard memory'),
 (5, 5, 26000, 52.00, 114.00, 58.00, 36.00, 'PAW3395', 1000, 'Kailh 8.0', 80000000, '2.4GHz Wireless', 70, 'USB-C', 1, 6, '4 onboard profiles'),
-(11, 6, 30000, 58.00, 126.70, 57.60, 37.80, 'Optical', 1000, 'Optical Gen-3', 90000000, 'Wireless', 80, 'USB-C', 0, 5, '5');
+(11, 6, 30000, 58.00, 126.70, 57.60, 37.80, 'Optical', 1000, 'Optical Gen-3', 90000000, 'Wireless', 80, 'USB-C', 0, 5, '5'),
+(12, 7, 30000, 56.00, 126.00, 57.00, 38.00, ' PAW3950', 8000, 'Huano TBPD', 80000000, '2.4GHz, Bluetooth, USB', 130, 'USB-C', 0, 6, '5');
 
 -- --------------------------------------------------------
 
@@ -551,7 +559,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `address`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'admintest', 'admin@example.com', '$2b$12$.4tn.sVnaxkxlxMhpXaURuVE0gBta5Z/aE7S7GIcDU0s19.cgZaLm', 'Hoang Dinh Hai Anh', NULL, NULL, 'admin', '2024-12-04 03:38:09', '2024-12-04 03:38:09'),
 (2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 12:12:00'),
-(3, 'testuser2', 'test2@example.eg', '$2b$12$WVwDUZBsSWiw2P8uZ52Rc.xRIcbOdPjPFrXacuLd5X.fB7F4uKH3q', 'Ko Co Ten', NULL, NULL, 'user', '2025-01-14 22:49:17', '2025-01-14 22:49:17');
+(3, 'testuser2', 'test2@example.eg', '$2b$12$WVwDUZBsSWiw2P8uZ52Rc.xRIcbOdPjPFrXacuLd5X.fB7F4uKH3q', 'Không Có Tên', '0366771508', 'lay đây mai đó', 'user', '2025-01-14 22:49:17', '2025-01-16 10:43:43');
 
 -- --------------------------------------------------------
 
@@ -611,7 +619,7 @@ CREATE TABLE `warranty_claims` (
   `claim_id` bigint(20) UNSIGNED NOT NULL,
   `order_detail_id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
-  `claim_date` datetime NOT NULL,
+  `claim_date` datetime DEFAULT current_timestamp(),
   `issue_description` text NOT NULL,
   `status` enum('pending','processing','completed','rejected') NOT NULL,
   `resolution_notes` text DEFAULT NULL,
@@ -619,6 +627,13 @@ CREATE TABLE `warranty_claims` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `warranty_claims`
+--
+
+INSERT INTO `warranty_claims` (`claim_id`, `order_detail_id`, `user_id`, `claim_date`, `issue_description`, `status`, `resolution_notes`, `resolved_date`, `created_at`, `updated_at`) VALUES
+(1, 2, 2, '2025-01-16 20:03:45', 'Hàng này cũng bán được thì chịu dồi', 'pending', 'Hoàn x10', NULL, '2025-01-16 13:03:45', '2025-01-16 13:03:45');
 
 -- --------------------------------------------------------
 
@@ -636,6 +651,13 @@ CREATE TABLE `warranty_policies` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `warranty_policies`
+--
+
+INSERT INTO `warranty_policies` (`warranty_id`, `product_id`, `warranty_period`, `warranty_type`, `warranty_description`, `warranty_conditions`, `created_at`, `updated_at`) VALUES
+(1, 1, 24, 'Manufacturer Warranty', '2 years manufacturer warranty', 'Valid only with original receipt', '2025-01-16 13:08:35', '2025-01-16 13:08:35');
 
 --
 -- Indexes for dumped tables
@@ -806,19 +828,19 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `coupons`
 --
 ALTER TABLE `coupons`
-  MODIFY `coupon_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `coupon_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `coupon_category_restrictions`
 --
 ALTER TABLE `coupon_category_restrictions`
-  MODIFY `restriction_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `restriction_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `coupon_usage_history`
@@ -848,7 +870,7 @@ ALTER TABLE `order_details`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `product_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `product_images`
@@ -866,7 +888,7 @@ ALTER TABLE `product_promotions`
 -- AUTO_INCREMENT for table `product_views`
 --
 ALTER TABLE `product_views`
-  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 
 --
 -- AUTO_INCREMENT for table `promotions`
@@ -878,7 +900,7 @@ ALTER TABLE `promotions`
 -- AUTO_INCREMENT for table `technical_specs`
 --
 ALTER TABLE `technical_specs`
-  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `spec_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `traffic_analytics`
@@ -908,13 +930,13 @@ ALTER TABLE `user_reviews`
 -- AUTO_INCREMENT for table `warranty_claims`
 --
 ALTER TABLE `warranty_claims`
-  MODIFY `claim_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `claim_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `warranty_policies`
 --
 ALTER TABLE `warranty_policies`
-  MODIFY `warranty_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `warranty_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
