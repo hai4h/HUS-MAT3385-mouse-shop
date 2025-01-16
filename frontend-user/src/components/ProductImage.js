@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const ProductImage = ({ mainImage, thumbnails = [], alt, className = '' }) => {
   const [error, setError] = useState(false);
-  const baseUrl = 'http://0.0.0.0:8000'; // API URL
+  const baseUrl = 'https://mou-x-test.azurewebsites.net'; // API URL
 
   const handleImageError = () => {
     setError(true);

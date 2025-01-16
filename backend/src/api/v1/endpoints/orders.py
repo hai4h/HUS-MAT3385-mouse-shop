@@ -212,23 +212,37 @@ async def create_order(
 
 @router.get("/", response_model=List[OrderResponse])
 async def get_user_orders(current_user = Depends(get_current_user)):
-    """Get all orders for current user"""
+    """Get all orders for current user or all orders if admin"""
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        cursor.execute(
-            """SELECT o.*, GROUP_CONCAT(p.name) as products
-               FROM orders o
-               JOIN order_details od ON o.order_id = od.order_id
-               JOIN products p ON od.product_id = p.product_id
-               WHERE o.user_id = %s
-               GROUP BY o.order_id
-               ORDER BY o.order_date DESC""",
-            (current_user["user_id"],)
-        )
+        if current_user["role"] == "admin":
+            # Admin gets all orders
+            cursor.execute(
+                """SELECT o.*, GROUP_CONCAT(p.name) as products 
+                   FROM orders o
+                   JOIN order_details od ON o.order_id = od.order_id
+                   JOIN products p ON od.product_id = p.product_id
+                   GROUP BY o.order_id
+                   ORDER BY o.order_date DESC"""
+            )
+        else:
+            # Regular users get only their orders
+            cursor.execute(
+                """SELECT o.*, GROUP_CONCAT(p.name) as products
+                   FROM orders o
+                   JOIN order_details od ON o.order_id = od.order_id
+                   JOIN products p ON od.product_id = p.product_id
+                   WHERE o.user_id = %s
+                   GROUP BY o.order_id
+                   ORDER BY o.order_date DESC""",
+                (current_user["user_id"],)
+            )
+            
         orders = cursor.fetchall()
         return orders
+        
     finally:
         cursor.close()
         conn.close()
@@ -244,11 +258,37 @@ async def get_order_details(
     
     try:
         cursor.execute(
-            """SELECT o.*, GROUP_CONCAT(p.name) as products
+            """SELECT 
+                o.order_id,
+                o.user_id,
+                o.total_amount,
+                o.status,
+                o.shipping_address,
+                o.note,
+                o.order_date,
+                o.updated_at,
+                o.promotion_id,
+                o.discount_amount,
+                o.coupon_id,
+                o.coupon_discount,
+                GROUP_CONCAT(p.name) as products
                FROM orders o
                JOIN order_details od ON o.order_id = od.order_id
                JOIN products p ON od.product_id = p.product_id
-               WHERE o.order_id = %s AND o.user_id = %s""",
+               WHERE o.order_id = %s AND o.user_id = %s
+               GROUP BY 
+                o.order_id,
+                o.user_id,
+                o.total_amount,
+                o.status,
+                o.shipping_address,
+                o.note,
+                o.order_date,
+                o.updated_at,
+                o.promotion_id,
+                o.discount_amount,
+                o.coupon_id,
+                o.coupon_discount""",
             (order_id, current_user["user_id"])
         )
         order = cursor.fetchone()

@@ -1,16 +1,18 @@
 version: '3.8'
+
 services:
   backend:
     build: 
       context: ./backend
       dockerfile: Dockerfile
+    image: hai4h/test-backend:latest
     volumes:
       - ./backend:/app
     environment:
-      - DB_HOST=database
-      - DB_USER=root
-      - DB_PASSWORD=
-      - DB_NAME=mouse_shop
+      - DB_HOST=mou-x-db.mysql.database.azure.com
+      - DB_USER=mouserx
+      - DB_PASSWORD=123456db!
+      - DB_NAME=mouse_shop 
     ports:
       - "8000:8000"
 
@@ -18,18 +20,9 @@ services:
     build: 
       context: ./frontend-user
       dockerfile: Dockerfile
+    image: hai4h/test-frontend-user:latest
     volumes:
       - ./frontend-user:/app
       - /app/node_modules
     ports:
       - "3000:3000"
-
-  database:
-    image: mysql:8.0
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=mouse_shop
-    volumes:
-      - ./backend/mysql/db/mouse_shop.sql:/docker-entrypoint-initdb.d/mouse_shop.sql
-    ports:
-      - "3306:3306"

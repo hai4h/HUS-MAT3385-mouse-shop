@@ -47,7 +47,43 @@ class MyComponent extends Component {
     this.handleSessionExpired = this.handleSessionExpired.bind(this);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    // Define state keys that should trigger a re-render
+    const relevantStateKeys = [
+      'user',
+      'showSearch',
+      'showLogin',
+      'showSignup',
+      'showCart',
+      'showUserSidebar',
+      'cartItems',
+      'showToast',
+      'toastMessage',
+      'searchQuery',
+      'showSessionExpiredModal',
+      'selectedProduct',
+      'isModalOpen'
+    ];
   
+    // Check if any relevant state has changed
+    const hasStateChanged = relevantStateKeys.some(key => {
+      // Special handling for arrays (cartItems)
+      if (Array.isArray(this.state[key])) {
+        return (
+          JSON.stringify(this.state[key]) !== JSON.stringify(nextState[key])
+        );
+      }
+      // Special handling for objects (user, selectedProduct)
+      if (typeof this.state[key] === 'object' && this.state[key] !== null) {
+        return JSON.stringify(this.state[key]) !== JSON.stringify(nextState[key]);
+      }
+      // Default comparison for primitive values
+      return this.state[key] !== nextState[key];
+    });
+  
+    // If no relevant state has changed, prevent re-render
+    return hasStateChanged;
+  }
 
   loadCompleteUserData = async () => {
     const currentUser = authService.getCurrentUser();
@@ -459,7 +495,7 @@ class MyComponent extends Component {
     }
   
     try {
-      const response = await axiosInstance.get('/cart');
+      const response = await axiosInstance.get('/cart/');
       const cartItems = response.data.items || [];
       
       if (JSON.stringify(cartItems) !== JSON.stringify(this.state.cartItems)) {

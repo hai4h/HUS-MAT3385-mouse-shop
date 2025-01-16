@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 15, 2025 at 11:51 AM
+-- Generation Time: Jan 15, 2025 at 07:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -20,22 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `mouse_shop`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin_dashboard_stats`
---
-
-CREATE TABLE `admin_dashboard_stats` (
-  `stat_id` bigint(20) UNSIGNED NOT NULL,
-  `total_users` int(11) DEFAULT 0,
-  `total_orders` int(11) DEFAULT 0,
-  `total_revenue` decimal(12,2) DEFAULT 0.00,
-  `total_products` int(11) DEFAULT 0,
-  `avg_order_value` decimal(10,2) DEFAULT 0.00,
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -76,7 +60,9 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
-(58, 1, 1, 1, '2025-01-15 10:30:07');
+(58, 1, 1, 1, '2025-01-15 10:30:07'),
+(59, 1, 4, 1, '2025-01-15 12:25:41'),
+(60, 1, 5, 1, '2025-01-15 14:42:08');
 
 -- --------------------------------------------------------
 
@@ -430,7 +416,12 @@ INSERT INTO `product_views` (`view_id`, `product_id`, `session_id`, `viewed_at`)
 (101, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:26'),
 (102, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:28'),
 (103, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:32'),
-(104, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:52');
+(104, 1, '1736864067176-85mzn8s5g', '2025-01-15 10:29:52'),
+(105, 2, '1736943116478-5io6c8bcl', '2025-01-15 12:35:35'),
+(106, 1, '1736943232094-rl74d1tew', '2025-01-15 13:54:34'),
+(107, 2, '1736943232094-rl74d1tew', '2025-01-15 13:55:43'),
+(108, 1, '1736943232094-rl74d1tew', '2025-01-15 13:55:56'),
+(109, 1, '1736943232094-rl74d1tew', '2025-01-15 14:10:58');
 
 -- --------------------------------------------------------
 
@@ -651,12 +642,6 @@ CREATE TABLE `warranty_policies` (
 --
 
 --
--- Indexes for table `admin_dashboard_stats`
---
-ALTER TABLE `admin_dashboard_stats`
-  ADD PRIMARY KEY (`stat_id`);
-
---
 -- Indexes for table `carts`
 --
 ALTER TABLE `carts`
@@ -812,12 +797,6 @@ ALTER TABLE `warranty_policies`
 --
 
 --
--- AUTO_INCREMENT for table `admin_dashboard_stats`
---
-ALTER TABLE `admin_dashboard_stats`
-  MODIFY `stat_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
@@ -827,7 +806,7 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `coupons`
@@ -887,7 +866,7 @@ ALTER TABLE `product_promotions`
 -- AUTO_INCREMENT for table `product_views`
 --
 ALTER TABLE `product_views`
-  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `promotions`

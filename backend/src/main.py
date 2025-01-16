@@ -16,13 +16,24 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://mou-x.azurewebsites.net",
+        "https://mou-x-test.azurewebsites.net",
         "http://0.0.0.0:3000",
-        "http://0.0.0.0:3001"
+        "http://0.0.0.0:3001",
+        "http://localhost:3000",
+        "http://localhost:3001"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers['Content-Security-Policy'] = 'upgrade-insecure-requests'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
