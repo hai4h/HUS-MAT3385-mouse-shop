@@ -179,3 +179,74 @@ async def remove_promotion_from_product(
     finally:
         cursor.close()
         conn.close()
+
+@router.put("/{promotion_id}", response_model=Promotion)
+async def update_promotion(
+    promotion_id: int,
+    promotion: PromotionUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update an existing promotion"""
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Verify promotion exists
+        cursor.execute(
+            "SELECT * FROM promotions WHERE promotion_id = %s",
+            (promotion_id,)
+        )
+        existing_promotion = cursor.fetchone()
+        if not existing_promotion:
+            raise HTTPException(
+                status_code=404,
+                detail="Promotion not found"
+            )
+
+        # Update promotion
+        cursor.execute("""
+            UPDATE promotions 
+            SET name = %s, 
+                description = %s, 
+                discount_type = %s, 
+                discount_value = %s,
+                start_date = %s, 
+                end_date = %s, 
+                min_order_value = %s, 
+                max_discount_amount = %s,
+                usage_limit = %s, 
+                is_active = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE promotion_id = %s
+        """, (
+            promotion.name, 
+            promotion.description, 
+            promotion.discount_type,
+            promotion.discount_value, 
+            promotion.start_date, 
+            promotion.end_date,
+            promotion.min_order_value, 
+            promotion.max_discount_amount,
+            promotion.usage_limit, 
+            promotion.is_active,
+            promotion_id
+        ))
+        conn.commit()
+
+        # Fetch and return updated promotion
+        cursor.execute(
+            "SELECT * FROM promotions WHERE promotion_id = %s", 
+            (promotion_id,)
+        )
+        updated_promotion = cursor.fetchone()
+        return updated_promotion
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()

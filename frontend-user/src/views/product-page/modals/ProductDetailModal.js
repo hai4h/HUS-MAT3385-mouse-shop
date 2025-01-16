@@ -171,7 +171,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart }) => {
                   <ThumbnailPlaceholder />
                 )}
               </div>
-          </div>
+            </div>
 
             <div className="product-info">
               <h2 className="product-title">{product.name}</h2>

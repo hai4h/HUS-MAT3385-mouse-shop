@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Literal, Optional
 from datetime import datetime
 from decimal import Decimal
 
@@ -27,3 +27,16 @@ class OrderResponse(BaseModel):
     products: str  # Comma-separated list of product names
     order_date: datetime
     updated_at: datetime
+
+class OrderStatusUpdate(BaseModel):
+    status: Literal['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+
+    @field_validator('status')
+    def validate_status(cls, v):
+        valid_statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+        if v not in valid_statuses:
+            raise ValueError(f'Invalid status. Must be one of: {", ".join(valid_statuses)}')
+        return v
+    
+class OrderStatusUpdateSchema(BaseModel):
+    status: Literal['pending', 'processing', 'shipped', 'delivered', 'cancelled']

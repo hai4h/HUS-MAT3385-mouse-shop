@@ -202,7 +202,7 @@ async def list_products(
     is_wireless: Optional[bool] = None,
     brand: Optional[str] = None,
     min_price: Optional[float] = None,
-    max_price: Optional[float] = None
+    max_price: Optional[float] = None,
 ):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

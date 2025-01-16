@@ -1,18 +1,19 @@
 .login-signup-sidebar {
-    position: fixed;
-    top: -50%; /* Đặt khung login ở ngoài màn hình, phía trên */
-    left: 50%; /* Căn giữa theo chiều ngang */
-    transform: translateX(-50%); /* Căn chỉnh chính xác giữa theo chiều ngang */
-    background: white;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Điều chỉnh bóng đổ xuống dưới */
-    transition: top 0.5s ease-in-out; 
-    z-index: 1000;
-  
-    width: 50vh;
-    height: auto;
-    padding: 2vh;
-    border: 2px solid red;
-    border-radius: 10px;
+  position: fixed;
+  top: -50%; /* Đặt khung login ở ngoài màn hình, phía trên */
+  left: 50%; /* Căn giữa theo chiều ngang */
+  transform: translateX(-50%); /* Căn chỉnh chính xác giữa theo chiều ngang */
+  background: white;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Điều chỉnh bóng đổ xuống dưới */
+  transition: top 0.5s ease-in-out; 
+  z-index: 1000;
+
+  width: 50vh;
+  max-width: 80vw;
+  height: auto;
+  padding: 2vh;
+  border: 2px solid red;
+  border-radius: 10px;
   
 
   &.active {

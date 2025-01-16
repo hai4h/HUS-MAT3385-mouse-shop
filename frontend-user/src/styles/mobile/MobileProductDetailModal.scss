@@ -15,16 +15,16 @@
 
       .close-button {
         position: fixed;
-        top: 0.5rem;
-        right: 0.5rem;
-        font-size: 1.5rem;
+        top: 4vh;
+        right: 4vw;
+        font-size: 3rem;
         z-index: 10;
       }
 
       .modal-body {
         height: 100%;
         overflow-y: auto;
-        padding-bottom: 5rem; // Space for fixed price section
+        padding-bottom: 4vh; // Space for fixed price section
         
         .product-details {
           // Remove flex styling to allow vertical scrolling
@@ -95,8 +95,7 @@
               left: 0;
               right: 0;
               background: white;
-              padding: 1rem;
-              padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+              padding-bottom: calc(4vh + env(safe-area-inset-bottom));
               box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
               z-index: 1;
 

@@ -152,3 +152,113 @@ async def get_coupon_restrictions(
     finally:
         cursor.close()
         conn.close()
+
+@router.get("/", response_model=List[Coupon])
+async def list_coupons(current_user: dict = Depends(get_current_user)):
+    """Get all coupons"""
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # First get all coupons
+        cursor.execute("SELECT * FROM coupons ORDER BY created_at DESC")
+        coupons = cursor.fetchall()
+        
+        # Then get restrictions for each coupon
+        for coupon in coupons:
+            cursor.execute("""
+                SELECT category, category_value 
+                FROM coupon_category_restrictions
+                WHERE coupon_id = %s
+            """, (coupon['coupon_id'],))
+            
+            restrictions = cursor.fetchall()
+            coupon['category_restrictions'] = restrictions if restrictions else []
+                
+        return coupons
+        
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/{coupon_id}", response_model=Coupon)
+async def update_coupon(
+    coupon_id: int,
+    coupon: CouponUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update existing coupon (admin only)"""
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Start transaction
+        conn.start_transaction()
+
+        # Update coupon
+        cursor.execute("""
+            UPDATE coupons SET
+                code = %s,
+                name = %s,
+                description = %s,
+                discount_type = %s,
+                discount_value = %s,
+                min_order_value = %s,
+                max_discount_amount = %s,
+                start_date = %s,
+                end_date = %s,
+                total_usage_limit = %s,
+                user_usage_limit = %s,
+                is_active = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE coupon_id = %s
+        """, (
+            coupon.code, coupon.name, coupon.description,
+            coupon.discount_type, coupon.discount_value,
+            coupon.min_order_value, coupon.max_discount_amount,
+            coupon.start_date, coupon.end_date,
+            coupon.total_usage_limit, coupon.user_usage_limit,
+            coupon.is_active, coupon_id
+        ))
+
+        # Update category restrictions if provided
+        if coupon.category_restrictions is not None:
+            # Delete existing restrictions
+            cursor.execute(
+                "DELETE FROM coupon_category_restrictions WHERE coupon_id = %s",
+                (coupon_id,)
+            )
+            
+            # Add new restrictions
+            for restriction in coupon.category_restrictions:
+                cursor.execute("""
+                    INSERT INTO coupon_category_restrictions 
+                    (coupon_id, category, category_value)
+                    VALUES (%s, %s, %s)
+                """, (
+                    coupon_id,
+                    restriction['category'],
+                    restriction['category_value']
+                ))
+
+        conn.commit()
+
+        # Get updated coupon
+        cursor.execute(
+            "SELECT * FROM coupons WHERE coupon_id = %s",
+            (coupon_id,)
+        )
+        return cursor.fetchone()
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()

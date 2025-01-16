@@ -1,0 +1,64 @@
+.login-page {
+    @apply min-h-screen flex items-center justify-center bg-gray-100;
+  
+    .login-container {
+      @apply max-w-md w-full mx-4;
+  
+      .login-card {
+        @apply bg-white p-8 rounded-lg shadow-md;
+  
+        .login-title {
+          @apply text-2xl font-bold text-center mb-8;
+        }
+  
+        .login-error {
+          @apply bg-red-50 text-red-500 p-3 rounded mb-4;
+        }
+  
+        .login-form {
+          .form-group {
+            @apply mb-4;
+  
+            &.password-group {
+              @apply mb-6;
+            }
+  
+            .form-label {
+              @apply block text-gray-700 text-sm font-bold mb-2;
+            }
+  
+            .form-input {
+              @apply w-full p-2 border rounded;
+              @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+              @apply disabled:opacity-50 disabled:bg-gray-100;
+            }
+          }
+  
+          .login-button {
+            @apply w-full bg-blue-500 text-white py-2 rounded;
+            @apply hover:bg-blue-600 disabled:opacity-50;
+            @apply transition duration-200 ease-in-out;
+          }
+        }
+      }
+    }
+
+    .user-site-link {
+        margin-top: 1rem;
+        text-align: center;
+    
+        .user-site-button {
+          background: none;
+          border: 1px solid #2563eb;
+          color: #2563eb;
+          padding: 0.625rem 1.25rem;
+          border-radius: 4px;
+          transition: all 0.2s;
+          
+          &:hover {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+          }
+        }
+    }
+  }

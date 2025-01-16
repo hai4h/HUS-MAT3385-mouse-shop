@@ -43,12 +43,12 @@
     border-radius: 0.5rem;
 
     .orders-section {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
 
       .orders-grid {
         display: grid;
         gap: 1rem;
-        max-height: 40vh;
+        max-height: 30vh;
         overflow-y: auto;
 
         .order-select-button {

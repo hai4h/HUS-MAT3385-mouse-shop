@@ -90,4 +90,188 @@ async def create_warranty_claim(
         cursor.close()
         conn.close()
 
-# Add other warranty endpoints
+@router.get("/claims", response_model=List[dict])
+async def list_warranty_claims(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all warranty claims (admin only)"""
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT 
+                wc.claim_id, 
+                wc.order_detail_id, 
+                wc.user_id, 
+                wc.issue_description, 
+                wc.status, 
+                wc.claim_date,
+                u.full_name as customer_name,
+                p.name as product_name
+            FROM warranty_claims wc
+            JOIN order_details od ON wc.order_detail_id = od.order_detail_id
+            JOIN products p ON od.product_id = p.product_id
+            JOIN users u ON wc.user_id = u.user_id
+            ORDER BY wc.claim_date DESC
+        """)
+        claims = cursor.fetchall()
+        return claims
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/policies", response_model=List[dict])
+async def list_warranty_policies(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all warranty policies (admin only)"""
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT 
+                wp.warranty_id, 
+                wp.product_id, 
+                wp.warranty_period, 
+                wp.warranty_type,
+                wp.warranty_description,
+                wp.warranty_conditions,
+                p.name as product_name
+            FROM warranty_policies wp
+            JOIN products p ON wp.product_id = p.product_id
+            ORDER BY wp.created_at DESC
+        """)
+        policies = cursor.fetchall()
+        return policies
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/order/{order_id}/policies", response_model=List[dict])
+async def get_order_warranty_policies(
+    order_id: int,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get warranty policies for all products in a specific order"""
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Verify the order belongs to the current user
+        cursor.execute(
+            "SELECT * FROM orders WHERE order_id = %s AND user_id = %s",
+            (order_id, current_user['user_id'])
+        )
+        order = cursor.fetchone()
+        
+        if not order:
+            raise HTTPException(
+                status_code=403, 
+                detail="Not authorized to view this order's warranty details"
+            )
+
+        # Fetch warranty details for all products in the order
+        cursor.execute("""
+            SELECT 
+                od.product_id,
+                p.name AS product_name,
+                wp.warranty_period,
+                wp.warranty_type,
+                wp.warranty_description,
+                wp.warranty_conditions,
+                o.order_date,
+                DATE_ADD(o.order_date, INTERVAL wp.warranty_period MONTH) AS warranty_end_date,
+                CASE 
+                    WHEN CURRENT_DATE <= DATE_ADD(o.order_date, INTERVAL wp.warranty_period MONTH) 
+                    THEN 'Valid' 
+                    ELSE 'Expired' 
+                END AS warranty_status
+            FROM order_details od
+            JOIN orders o ON od.order_id = o.order_id
+            JOIN products p ON od.product_id = p.product_id
+            LEFT JOIN warranty_policies wp ON p.product_id = wp.product_id
+            WHERE o.order_id = %s
+        """, (order_id,))
+        
+        warranty_policies = cursor.fetchall()
+        
+        return warranty_policies
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/policies/{product_id}", response_model=dict)
+async def get_product_warranty_policy(
+    product_id: int,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get warranty policy for a specific product"""
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT 
+                wp.warranty_period,
+                wp.warranty_type,
+                wp.warranty_description,
+                wp.warranty_conditions,
+                p.name AS product_name
+            FROM warranty_policies wp
+            JOIN products p ON wp.product_id = p.product_id
+            WHERE wp.product_id = %s
+        """, (product_id,))
+        
+        policy = cursor.fetchone()
+        
+        if not policy:
+            raise HTTPException(
+                status_code=404, 
+                detail="No warranty policy found for this product"
+            )
+        
+        return policy
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/orders", response_model=List[dict])
+async def get_user_orders(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all orders for the current user"""
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT 
+                o.order_id, 
+                o.order_date, 
+                GROUP_CONCAT(p.name SEPARATOR ', ') as products
+            FROM orders o
+            JOIN order_details od ON o.order_id = od.order_id
+            JOIN products p ON od.product_id = p.product_id
+            WHERE o.user_id = %s
+            GROUP BY o.order_id, o.order_date
+            ORDER BY o.order_date DESC
+        """, (current_user['user_id'],))
+        
+        orders = cursor.fetchall()
+        return orders
+
+    finally:
+        cursor.close()
+        conn.close()

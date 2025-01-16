@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from src.core.security import get_current_user
 from src.db.database import get_db_connection
-from src.models.schemas.order import OrderCreate, OrderResponse
+from src.models.schemas.order import OrderCreate, OrderResponse, OrderStatusUpdate, OrderStatusUpdateSchema
 
 router = APIRouter()
 
@@ -425,6 +425,91 @@ async def get_order_details_by_order(
         details = cursor.fetchall()
         
         return details
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.patch("/{order_id}/status", response_model=OrderResponse)
+async def update_order_status(
+    order_id: int, 
+    status_update: OrderStatusUpdateSchema,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update order status (admin only)"""
+    # Validate that only admin can update status
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403, 
+            detail="Only administrators can update order status"
+        )
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Start transaction
+        conn.start_transaction()
+        
+        # First, check if order exists
+        cursor.execute(
+            "SELECT * FROM orders WHERE order_id = %s", 
+            (order_id,)
+        )
+        order = cursor.fetchone()
+        
+        if not order:
+            raise HTTPException(
+                status_code=404, 
+                detail="Order not found"
+            )
+
+        # Update order status
+        cursor.execute(
+            """UPDATE orders 
+               SET status = %s, 
+                   updated_at = CURRENT_TIMESTAMP 
+               WHERE order_id = %s""",
+            (status_update.status, order_id)
+        )
+
+        # Special handling for cancelled orders
+        if status_update.status == 'cancelled':
+            # Restore product stock
+            cursor.execute(
+                """UPDATE products p
+                   JOIN order_details od ON p.product_id = od.product_id
+                   SET p.stock_quantity = p.stock_quantity + od.quantity
+                   WHERE od.order_id = %s""",
+                (order_id,)
+            )
+
+            # Remove any coupon usage if applicable
+            cursor.execute(
+                """DELETE FROM coupon_usage_history 
+                   WHERE order_id = %s""",
+                (order_id,)
+            )
+
+        # Commit the transaction
+        conn.commit()
+        
+        # Fetch updated order details
+        cursor.execute(
+            """SELECT o.*, GROUP_CONCAT(p.name) as products
+               FROM orders o
+               JOIN order_details od ON o.order_id = od.order_id
+               JOIN products p ON od.product_id = p.product_id
+               WHERE o.order_id = %s
+               GROUP BY o.order_id""",
+            (order_id,)
+        )
+        updated_order = cursor.fetchone()
+        
+        return updated_order
+        
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
     finally:
         cursor.close()
         conn.close()

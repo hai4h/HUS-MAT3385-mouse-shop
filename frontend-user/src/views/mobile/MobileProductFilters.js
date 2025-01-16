@@ -191,12 +191,6 @@ const MobileProductFilters = ({
                 </label>
               </div>
             </div>
-
-            <div className="mobile-filters-actions">
-              <button onClick={toggleFilters}>
-                Áp dụng
-              </button>
-            </div>
           </div>
         </div>
       )}
