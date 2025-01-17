@@ -1,0 +1,103 @@
+.login-signup-sidebar {
+  position: fixed;
+  top: -50%; /* Đặt khung login ở ngoài màn hình, phía trên */
+  left: 50%; /* Căn giữa theo chiều ngang */
+  transform: translateX(-50%); /* Căn chỉnh chính xác giữa theo chiều ngang */
+  background: white;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Điều chỉnh bóng đổ xuống dưới */
+  transition: top 0.5s ease-in-out; 
+  z-index: 1000;
+
+  width: 50vh;
+  max-width: 80vw;
+  height: auto;
+  padding: 2vh;
+  border: 2px solid red;
+  border-radius: 10px;
+  
+
+  &.active {
+    top: 15vh; /* Hiển thị khung login ở vị trí cố định cách mép trên 50px */
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      text-align: left;
+      margin-bottom: 5px;
+    }
+
+    input {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .forgot-password {
+      width: fit-content;
+      color: red;
+      text-align: right;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+      cursor: pointer; 
+      font-style: italic;
+      margin-left: auto;
+    }
+
+    button {
+      padding: 10px;
+      margin-bottom: 20px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      &:hover {
+        background: darkred;
+      }
+    } 
+  }
+}
+  
+  /* Nút chuyển đổi Login-tab và Signup-tab*/
+  .form-toggle {
+    display: flex;
+    margin-bottom: 20px;
+  
+    .toggle-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background-color: #f1f1f1;
+      color: black;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+  
+      &.active {
+        background-color: #ff0000;
+        color: white;
+        border-radius: 5px;
+      }
+    }
+  }
+
+  .error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    color: #ff0000;
+    font-size: 0.8rem;
+  }

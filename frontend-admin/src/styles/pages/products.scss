@@ -1,0 +1,553 @@
+@import '../components/products/image.scss';
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.products-page {
+  .products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .products-title {
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .create-product-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #1d4ed8;
+    }
+
+    .button-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #6b7280;
+  }
+
+  .error-state {
+    padding: 1rem;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 0.375rem;
+    color: #dc2626;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .filter-toggle-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    color: #374151;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #e5e7eb;
+    }
+  }
+
+  .product-filters {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+
+      label {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      select, input {
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+      }
+    }
+
+    .price-range {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      input {
+        width: 100%;
+      }
+    }
+
+    .reset-filters {
+      padding: 0.5rem 1rem;
+      background-color: #f3f4f6;
+      color: #374151;
+      border: none;
+      border-radius: 0.375rem;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #e5e7eb;
+      }
+    }
+
+    .search-filter {
+      margin-bottom: 1rem;
+  
+      .search-container {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+  
+        .search-column-select {
+          padding: 0.5rem;
+          border: 1px solid #d1d5db;
+          border-radius: 0.375rem;
+          width: 200px;
+        }
+  
+        .search-input-wrapper {
+          flex: 1;
+          display: flex;
+          position: relative;
+  
+          input {
+            flex: 1;
+            padding: 0.5rem 2.5rem 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+          }
+  
+          .search-button, 
+          .reset-search-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+          }
+  
+          .search-button {
+            right: 10px;
+            color: #6b7280;
+          }
+  
+          .reset-search-button {
+            right: 35px;
+            color: #dc2626;
+          }
+        }
+      }
+    }
+  }
+
+  .search-id-container {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .search-icon {
+        position: absolute;
+        left: 10px;
+        color: #6b7280;
+      }
+
+      .search-id-input {
+        width: 100%;
+        padding: 0.5rem 0.5rem 0.5rem 40px;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: #2563eb;
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+      }
+
+      .clear-search-btn {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6b7280;
+        
+        &:hover {
+          color: #374151;
+        }
+      }
+    }
+  }
+}
+
+.products-list {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+
+  .products-table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 500;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #111827;
+    }
+
+    .product-image-cell {
+      img {
+        width: 4rem;
+        height: 4rem;
+        object-fit: cover;
+        border-radius: 0.375rem;
+      }
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+
+      &.active {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &.inactive {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+
+      .action-button {
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        color: #6b7280;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #f3f4f6;
+        }
+
+        &.view:hover {
+          color: #2563eb;
+        }
+
+        &.edit:hover {
+          color: #059669;
+        }
+
+        &.delete:hover {
+          color: #dc2626;
+        }
+
+        &.image:hover {
+          color: #3b82f6;
+          background: #eff6ff;
+        }
+      }
+    }
+  }
+}
+
+.product-form-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.product-form-modal {
+  background: white;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  animation: modal-appear 0.3s ease-out;
+
+  .form-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .close-button {
+      padding: 0.5rem;
+      border-radius: 50%;
+      color: #6b7280;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #f3f4f6;
+        color: #374151;
+      }
+    }
+  }
+
+  .product-form {
+    padding: 1.5rem;
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .form-section {
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .form-group {
+    margin-bottom: 1rem;
+
+    label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+
+        // Style cho label của checkbox
+        &.checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-weight: normal;
+        margin-bottom: 0;
+
+        input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            border: 1.5px solid #d1d5db;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            
+            &:checked {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            }
+
+            &:focus {
+            outline: 2px solid rgba(37, 99, 235, 0.2);
+            outline-offset: 2px;
+            }
+        }
+        }
+    }
+
+    // Style cho input và select
+    input, select, textarea {
+        width: 100%;
+        padding: 0.625rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background-color: white;
+        font-size: 0.875rem;
+        color: #111827;
+        transition: all 0.2s;
+
+        &:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        &:disabled {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+        }
+
+        &::placeholder {
+        color: #9ca3af;
+        }
+    }
+
+    // Đặc biệt cho select
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+
+        &:invalid {
+        color: #6b7280;
+        }
+
+        option {
+        color: #111827;
+        }
+    }
+
+    // Cho các trường bắt buộc
+    &.required label::after {
+        content: "*";
+        color: #ef4444;
+        margin-left: 0.25rem;
+    }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+
+      button {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &.cancel-button {
+          color: #6b7280;
+          background: white;
+          border: 1px solid #d1d5db;
+
+          &:hover {
+            background: #f3f4f6;
+          }
+        }
+
+        &.save-button {
+          color: white;
+          background: #2563eb;
+
+          &:hover {
+            background: #1d4ed8;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Style cho các form-row (nơi có 2 trường cạnh nhau)
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+// Style cho form sections
+.form-section {
+  h3 {
+    color: #1f2937;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+}

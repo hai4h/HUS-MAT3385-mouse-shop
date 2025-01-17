@@ -1,0 +1,39 @@
+// Colors
+$primary-color: #ff4444;
+$secondary-color: #333333;
+$background-color: #ffffff;
+$border-color: #eeeeee;
+$error-color: #dc2626;
+$success-color: #4CAF50;
+
+// Typography
+$font-family-base: "DIN Next", sans-serif;
+$font-size-base: 16px;
+$font-size-small: 14px;
+$font-size-large: 18px;
+
+// Spacing
+$spacing-unit: 8px;
+$spacing-small: $spacing-unit;
+$spacing-medium: $spacing-unit * 2;
+$spacing-large: $spacing-unit * 3;
+
+// Z-index levels
+$z-header: 50;
+$z-modal: 1000;
+$z-toast: 1200;
+$z-overlay: 900;
+
+// Transitions
+$transition-quick: 0.2s ease;
+$transition-default: 0.3s ease;
+
+// Border radius
+$border-radius-small: 4px;
+$border-radius-medium: 8px;
+$border-radius-large: 16px;
+
+// Shadows
+$shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-large: 0 10px 15px rgba(0, 0, 0, 0.1);

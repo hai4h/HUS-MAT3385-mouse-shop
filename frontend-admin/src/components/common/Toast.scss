@@ -1,0 +1,20 @@
+.toast {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    z-index: 1000;
+    transition: top 0.3s ease-in-out;
+    
+    &.show {
+      top: 20px;
+    }
+  
+    .toast-message {
+      font-size: 0.875rem;
+    }
+}

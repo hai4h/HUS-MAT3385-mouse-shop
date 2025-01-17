@@ -1,0 +1,36 @@
+// Base imports
+@import 'variables';
+@import 'breakpoints';
+@import 'App';
+
+// Desktop styles
+@import 'desktop/Cart';
+@import 'desktop/ProductPage';
+@import 'desktop/LoginSignup';
+@import 'desktop/ProductFilters';
+@import 'desktop/UserSidebar';
+
+// Mobile styles
+@import 'mobile/MobileLayout';
+@import 'mobile/MobileNav';
+@import 'mobile/MobileCart';
+@import 'mobile/MobileFilters';
+@import 'mobile/MobileProductDetailModal';
+@import 'mobile/MobileAccountManagement.scss';
+@import 'mobile/MobileProductFilters.scss';
+@import 'mobile/MobileCheckoutModal.scss';
+
+// Reset some default styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $secondary-color;
+  background-color: $background-color;
+}

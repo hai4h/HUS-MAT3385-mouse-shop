@@ -1,0 +1,37 @@
+@import '../breakpoints';
+
+.mobile-nav {
+  @include mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4vh;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 50;
+    
+    .nav-item {
+      position: relative;
+      padding: 0.5rem;
+      
+      .badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 1.25rem;
+        height: 1.25rem;
+        background: red;
+        color: white;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+}

@@ -1,0 +1,176 @@
+@import 'variables';
+@import 'breakpoints';
+
+// Base styles
+.app {
+  min-height: 100vh;
+  width: 100%;
+  font-family: $font-family-base;
+  font-size: 1rem;
+  
+  @include mobile {
+    padding-bottom: 3.5rem;
+  }
+}
+
+// Header styles
+.header {
+  @include desktop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $background-color;
+    padding: $spacing-medium;
+    border-bottom: 1px solid $border-color;
+    z-index: $z-header;
+
+    .logo {
+      font-weight: bold;
+      font-size: 2rem;
+      color: #ff1b1b;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: $spacing-medium;
+      align-items: center;
+
+      .search-input-container {
+        position: relative;
+        margin-left: auto;
+        transition: $transition-default;
+
+        input {
+          width: 100%;
+          padding: $spacing-small;
+          border: 1px solid $border-color;
+          border-radius: $border-radius-small;
+          transition: $transition-default;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+          }
+        }
+
+        &.hidden input {
+          width: 0;
+          padding: 0;
+          opacity: 0;
+        }
+      }
+
+      .icon {
+        cursor: pointer;
+        color: $secondary-color;
+        transition: $transition-quick;
+
+        &:hover {
+          color: $primary-color;
+        }
+
+        &.cart {
+          position: relative;
+
+          .cart-badge {
+            position: absolute;
+            bottom: 0;
+            right: -0.1rem;
+            min-width: 1rem;
+            height: 1rem;
+            background: #ff0000;
+            color: white;
+            border-radius: 50%;
+            border: 0.1rem solid #ffffff;
+            padding: 2px;
+            font-size: 8px;
+            font-weight: bolder;
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Overlay
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: $z-overlay;
+
+  &.active {
+    display: block;
+  }
+}
+
+// Toast
+.toast {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: $secondary-color;
+  color: $background-color;
+  padding: $spacing-medium;
+  border-radius: $border-radius-medium;
+  z-index: $z-toast;
+  transition: $transition-default;
+  
+  &.show {
+    top: 20px;
+  }
+}
+
+// Common utility classes
+.text-with-icon {
+  gap: $spacing-small;
+  align-items: center;
+  display: flex;
+  font-weight: bold;
+}
+
+// Loading and error states
+.loading, .error {
+  text-align: center;
+  padding: $spacing-large;
+  font-size: $font-size-large;
+  width: 100%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading {
+  color: $secondary-color;
+}
+
+.error {
+  color: $error-color;
+}
+
+// Animations
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,28 @@
+// Breakpoints
+$breakpoint-mobile: 768px;
+
+// Mixins
+@mixin mobile {
+  @media screen and (max-width: #{$breakpoint-mobile}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media screen and (min-width: #{$breakpoint-mobile + 1}) {
+    @content;
+  }
+}
+
+// Helper classes
+.desktop-only {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  @include desktop {
+    display: none !important;
+  }
+}

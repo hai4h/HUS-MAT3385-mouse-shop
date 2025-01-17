@@ -1,0 +1,155 @@
+@import '../variables';
+@import '../breakpoints';
+
+@include mobile {
+  .modal-overlay {
+    .modal-content {
+      width: 100%;
+      height: 100vh;
+      max-width: none;
+      max-height: none;
+      border-radius: 0;
+      padding: 1rem;
+      display: block; // Change to block display to allow natural vertical flow
+      padding-bottom: 11rem;
+
+      .close-button {
+        position: fixed;
+        top: 4vh;
+        right: 4vw;
+        font-size: 3rem;
+        z-index: 10;
+      }
+
+      .modal-body {
+        height: 100%;
+        overflow-y: auto;
+        padding-bottom: 4vh; // Space for fixed price section
+        
+        .product-details {
+          // Remove flex styling to allow vertical scrolling
+          display: block;
+          padding-bottom: 5rem;
+          
+          .image-gallery {
+            width: 90%;
+            padding: 1rem;
+            margin: 0 auto; // Thêm margin auto để căn giữa
+            position: relative;
+            height: auto;
+            
+            .main-image {
+              aspect-ratio: 1;
+              margin-bottom: 1rem;
+              background: #ffffff;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+              }
+            }
+
+            .thumbnails {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+              gap: 0.5rem;
+
+              .thumbnail {
+                aspect-ratio: 1;
+                background: #ffffff;
+                border-radius: 4px;
+                overflow: hidden;
+                cursor: pointer;
+
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: contain;
+                }
+              }
+            }
+          }
+
+          .product-info {
+            width: 100%;
+            padding: 1rem;
+            overflow: visible; // Bỏ overflow để không tạo scroll riêng
+            height: auto; // Cho phép chiều cao tự động mở rộng
+            display: block; // Đảm bảo hiển thị dạng block
+
+            .specifications {
+              .specs-grid {
+                grid-template-columns: 1fr;
+              }
+            }
+
+            .price-section {
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              background: white;
+              padding-bottom: calc(4vh + env(safe-area-inset-bottom));
+              box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+              z-index: 1;
+
+              .price-display {
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+
+                .discounted-price {
+                  font-size: 1.5rem;
+                  font-weight: bold;
+                  color: #ff4444;
+                }
+
+                .original-price {
+                  font-size: 1rem;
+                  color: #999;
+                  text-decoration: line-through;
+                }
+
+                .discount-badge {
+                  background: #ff4444;
+                  color: white;
+                  padding: 0.2rem 0.4rem;
+                  border-radius: 4px;
+                  font-size: 0.75rem;
+                  font-weight: 600;
+                }
+              }
+
+              .add-to-cart-section {
+                display: flex;
+                gap: 1rem;
+
+                .quantity-controls {
+                  flex: 0 0 auto;
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  border: 1px solid #ddd;
+                  border-radius: 4px;
+                  padding: 0.25rem;
+                }
+
+                .add-to-cart-button {
+                  flex: 1;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
