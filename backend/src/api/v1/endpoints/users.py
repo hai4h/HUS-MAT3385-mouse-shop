@@ -5,6 +5,9 @@ from src.models.schemas.user import User, UserCreate, UserBase, ChangeEmailReque
 from src.db.database import get_db_connection
 from pydantic import BaseModel, EmailStr
 from src.core.security import verify_password
+from passlib.context import CryptContext
+import random
+import string
 
 router = APIRouter()
 
@@ -80,48 +83,85 @@ async def update_user(
     current_user: dict = Depends(get_current_user)
 ):
     """Update user information"""
-    # Check authorization
-    if current_user["role"] != "admin" and current_user["user_id"] != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized to update this user")
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Prepare update fields and values
-        update_fields = []
-        update_values = []
-        
-        # Only update allowed fields
-        allowed_fields = ["full_name", "phone", "address"]
-        for field in allowed_fields:
-            if field in user_update and user_update[field] is not None:
-                update_fields.append(f"{field} = %s")
-                update_values.append(user_update[field])
-
-        if not update_fields:
-            raise HTTPException(status_code=400, detail="No valid fields to update")
-
-        # Add user_id to values
-        update_values.append(user_id)
-
-        # Construct and execute update query
-        update_query = f"""
-            UPDATE users 
-            SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
-            WHERE user_id = %s
-        """
-        cursor.execute(update_query, update_values)
-        conn.commit()
-
-        if cursor.rowcount == 0:
+        # Verify user exists
+        cursor.execute(
+            "SELECT * FROM users WHERE user_id = %s",
+            (user_id,)
+        )
+        existing_user = cursor.fetchone()
+        if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        # Fetch updated user data
-        cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
-        updated_user = cursor.fetchone()
+        # Define allowed fields based on role
+        allowed_fields = ["full_name", "phone", "address"]
+        if current_user["role"] == "admin":
+            # Admin can update additional fields
+            allowed_fields.extend(["username", "email"])
 
-        return updated_user
+            # Check if username is being changed and verify uniqueness
+            if "username" in user_update:
+                cursor.execute(
+                    "SELECT user_id FROM users WHERE username = %s AND user_id != %s",
+                    (user_update["username"], user_id)
+                )
+                if cursor.fetchone():
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Username already taken"
+                    )
+
+            # Check if email is being changed and verify uniqueness
+            if "email" in user_update:
+                cursor.execute(
+                    "SELECT user_id FROM users WHERE email = %s AND user_id != %s",
+                    (user_update["email"], user_id)
+                )
+                if cursor.fetchone():
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Email already registered"
+                    )
+
+        # Filter out non-allowed fields
+        update_data = {k: v for k, v in user_update.items() if k in allowed_fields}
+        
+        if not update_data:
+            raise HTTPException(
+                status_code=400,
+                detail="No valid fields to update"
+            )
+
+        # Construct update query
+        update_fields = ", ".join([f"{field} = %s" for field in update_data.keys()])
+        values = list(update_data.values())
+        values.append(user_id)  # for WHERE clause
+
+        # Update user
+        cursor.execute(
+            f"""UPDATE users 
+                SET {update_fields}, updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = %s""",
+            values
+        )
+
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Update failed"
+            )
+
+        conn.commit()
+
+        # Return updated user
+        cursor.execute(
+            "SELECT * FROM users WHERE user_id = %s",
+            (user_id,)
+        )
+        return cursor.fetchone()
 
     except HTTPException:
         raise
@@ -315,6 +355,114 @@ async def update_user_preferences(
         conn.commit()
         return {"message": "Preferences updated successfully"}
         
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.patch("/{user_id}/role", response_model=User)
+async def update_user_role(
+    user_id: int,
+    role_update: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user role (superadmin only)"""
+    # Verify that the requester is superadmin (user_id = 1)
+    if current_user["user_id"] != 1:
+        raise HTTPException(
+            status_code=403, 
+            detail="Only superadmin can modify user roles"
+        )
+
+    # Prevent modifying superadmin's role
+    if user_id == 1:
+        raise HTTPException(
+            status_code=403,
+            detail="Cannot modify superadmin's role"
+        )
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Verify target user exists
+        cursor.execute(
+            "SELECT user_id FROM users WHERE user_id = %s",
+            (user_id,)
+        )
+        if not cursor.fetchone():
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Update user role
+        cursor.execute(
+            """UPDATE users 
+               SET role = %s,
+                   updated_at = CURRENT_TIMESTAMP
+               WHERE user_id = %s""",
+            (role_update["role"], user_id)
+        )
+        conn.commit()
+
+        # Fetch and return updated user
+        cursor.execute(
+            "SELECT * FROM users WHERE user_id = %s",
+            (user_id,)
+        )
+        updated_user = cursor.fetchone()
+        return updated_user
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.post("/{user_id}/reset-password", response_model=dict)
+async def reset_user_password(
+    user_id: int,
+    current_user: dict = Depends(get_current_user)
+):
+    """Reset user password (admin only)"""
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Only admin can reset passwords"
+        )
+
+    if user_id == 1:  # Protect superadmin
+        raise HTTPException(
+            status_code=403,
+            detail="Cannot reset superadmin password"
+        )
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Generate a random password
+        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        hashed_password = get_password_hash(temp_password)
+
+        # Update password
+        cursor.execute(
+            """UPDATE users 
+               SET password_hash = %s,
+                   updated_at = CURRENT_TIMESTAMP
+               WHERE user_id = %s""",
+            (hashed_password, user_id)
+        )
+        conn.commit()
+
+        return {
+            "message": "Password reset successful",
+            "temp_password": temp_password
+        }
+
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))

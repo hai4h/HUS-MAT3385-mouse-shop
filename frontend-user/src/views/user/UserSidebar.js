@@ -18,7 +18,7 @@ class UserSidebar extends Component {
         username: currentUser.username,
         role: currentUser.role
       }).toString();
-      window.location.href = `http://0.0.0.0:3001?${params}`;
+      window.location.href = `https://mou-x-admin.azurewebsites.net?${params}`;
     }
   };
 

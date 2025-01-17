@@ -1,14 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axiosInstance from '../../services/axiosConfig';
 
-const ProductImage = ({ mainImage, thumbnails = [], alt, className = '' }) => {
+const ProductImage = ({ product, alt, className = '' }) => {
+  const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(false);
-  const baseUrl = 'https://mou-x-test.azurewebsites.net'; // API URL
+
+  useEffect(() => {
+    const fetchProductImage = async () => {
+      try {
+        const response = await axiosInstance.get(`/images/product/${product.product_id}`);
+        const primaryImage = response.data.primary_image;
+        const thumbnails = response.data.thumbnails || [];
+        
+        // Utility function to construct full URL
+        const getFullImageUrl = (imagePath) => {
+          // Remove leading slash if present
+          const cleanPath = imagePath.replace(/^\//, '');
+          
+          // Use the base URL from axiosInstance configuration
+          return `${axiosInstance.defaults.baseURL}/${cleanPath}`;
+        };
+    
+        if (primaryImage) {
+          setImageUrl(getFullImageUrl(primaryImage.image_url));
+        } else if (thumbnails.length > 0) {
+          const firstThumb = thumbnails[0];
+          setImageUrl(getFullImageUrl(firstThumb.image_url));
+        } else {
+          // Fallback to static path
+          setImageUrl(`/static/products/${product.product_id}/main.jpg`);
+        }
+      } catch (fetchError) {
+        console.error('Error fetching product images:', fetchError);
+        // Fallback to default image on error
+        setImageUrl(`/static/products/${product.product_id}/main.jpg`);
+      }
+    };
+
+    if (product && product.product_id) {
+      fetchProductImage();
+    }
+  }, [product]);
 
   const handleImageError = () => {
+    // If image fails to load, set error state
     setError(true);
   };
 
-  if (error || !mainImage) {
+  if (error || !imageUrl) {
     return (
       <div className={`${className} bg-gray-100 flex items-center justify-center`}>
         <span className="text-gray-400">No Image</span>
@@ -17,27 +56,12 @@ const ProductImage = ({ mainImage, thumbnails = [], alt, className = '' }) => {
   }
 
   return (
-    <div className={className}>
-      <img
-        src={`${baseUrl}${mainImage}`}
-        alt={alt}
-        className="w-full h-full object-contain"
-        onError={handleImageError}
-      />
-      {thumbnails?.length > 0 && (
-        <div className="thumbnails mt-4 grid grid-cols-4 gap-2">
-          {thumbnails.map((thumb, index) => (
-            <img
-              key={index}
-              src={`${baseUrl}${thumb.image_url}`}
-              alt={`${alt} thumbnail ${index + 1}`}
-              className="w-full h-full object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
-              onError={(e) => e.target.style.display = 'none'}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <img
+      src={imageUrl}
+      alt={alt}
+      className={`${className} object-contain`}
+      onError={handleImageError}
+    />
   );
 };
 

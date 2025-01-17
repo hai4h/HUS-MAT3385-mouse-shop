@@ -34,6 +34,7 @@ class ProductPage extends Component {
       uniqueHandSizes: [],
       uniqueGripStyles: [],
       selectedProduct: null,
+      productImages: {},
       isModalOpen: false
     };
   }
@@ -44,6 +45,21 @@ class ProductPage extends Component {
       // Fetch products
       const response = await axiosInstance.get('/products/');
       const products = response.data;
+
+      // Fetch images for all products
+      const productImagesMap = {};
+      for (const product of products) {
+        try {
+          const imageResponse = await axiosInstance.get(`/images/product/${product.product_id}`);
+          productImagesMap[product.product_id] = {
+            main: imageResponse.data.primary_image?.image_url,
+            thumbnails: imageResponse.data.thumbnails
+          };
+        } catch (imageError) {
+          console.error(`Error fetching images for product ${product.product_id}:`, imageError);
+          productImagesMap[product.product_id] = { main: null, thumbnails: [] };
+        }
+      }
       
       // Fetch promotions for each product
       const productsWithPromotions = await Promise.all(
@@ -117,6 +133,7 @@ class ProductPage extends Component {
   
       this.setState({
         products: productsWithPromotions,
+        productImages: productImagesMap,
         filteredProducts: productsWithPromotions,
         loading: false,
         uniqueBrands,
@@ -334,7 +351,11 @@ class ProductPage extends Component {
 
               <div className="product-image">
                 <ProductImage
-                  mainImage={product.main_image || `/static/products/${product.product_id}/main.jpg`}
+                  mainImage={
+                    product.main_image || 
+                    (this.state.productImages[product.product_id]?.main || 
+                    `/static/products/${product.product_id}/main.jpg`)
+                  }
                   alt={product.name}
                 />
                 {product.hasPromotion && (

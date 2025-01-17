@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import axiosInstance from '../services/axiosConfig';
 
 const ProductImage = ({ mainImage, thumbnails = [], alt, className = '' }) => {
   const [error, setError] = useState(false);
-  const baseUrl = 'https://mou-x-test.azurewebsites.net'; // API URL
+  const baseUrl = axiosInstance.defaults.baseURL;
 
   const handleImageError = () => {
     setError(true);

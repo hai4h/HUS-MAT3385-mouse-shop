@@ -1,8 +1,8 @@
 import React from 'react';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, Image } from 'lucide-react';
 import ProductImage from './ProductImage';
 
-const ProductList = ({ products, onEdit, onRefresh }) => {
+const ProductList = ({ products, onEdit, onRefresh, onImageManage }) => {
   return (
     <div className="products-list">
       <table className="products-table">
@@ -23,11 +23,11 @@ const ProductList = ({ products, onEdit, onRefresh }) => {
             <tr key={product.product_id}>
               <td>{product.product_id}</td>
               <td className="product-image-cell">
-                <ProductImage 
-                  mainImage={product.main_image || `/static/products/${product.product_id}/main.jpg`}
-                  alt={product.name}
-                  className="w-16 h-16"
-                />
+              <ProductImage 
+                product={product}
+                alt={product.name}
+                className="w-16 h-16"
+              />
               </td>
               <td>{product.name}</td>
               <td>{product.brand}</td>
@@ -60,6 +60,14 @@ const ProductList = ({ products, onEdit, onRefresh }) => {
                     }}
                   >
                     <Trash2 size={16} />
+                  </button>
+
+                  <button 
+                    className="action-button image"
+                    onClick={() => onImageManage(product)}
+                    title="Manage Images"
+                  >
+                    <Image size={16} />
                   </button>
                 </div>
               </td>

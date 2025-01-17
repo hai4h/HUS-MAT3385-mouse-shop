@@ -3,9 +3,72 @@ import React, { useState } from 'react';
 const UserEditModal = ({ user, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     full_name: user.full_name || '',
+    username: user.username || '',
+    email: user.email || '',
     phone: user.phone || '',
     address: user.address || '',
   });
+
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+      
+    if (!formData.full_name.trim()) {
+      newErrors.full_name = 'Full name is required';
+    }
+      
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      newErrors.username = 'Username can only contain letters, numbers, and underscores';
+    }
+  
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+  
+    if (formData.phone && !/^[0-9+\-\s()]*$/.test(formData.phone)) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+  
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  // Handle API errors
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+      
+    if (!validateForm()) {
+      return;
+    }
+  
+    try {
+      await onSave(user.user_id, formData);
+      onClose();
+    } catch (error) {
+      // Check specific error types
+      if (error.response?.data?.detail) {
+        if (error.response.data.detail.includes('Username')) {
+          setErrors(prev => ({...prev, username: error.response.data.detail}));
+        } else if (error.response.data.detail.includes('Email')) {
+          setErrors(prev => ({...prev, email: error.response.data.detail}));
+        } else {
+          setErrors(prev => ({...prev, submit: error.response.data.detail}));
+        }
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          submit: 'Failed to save changes. Please try again.'
+        }));
+      }
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,63 +76,98 @@ const UserEditModal = ({ user, onClose, onSave }) => {
       ...prev,
       [name]: value
     }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await onSave(user.user_id, formData);
-    onClose();
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>Chỉnh sửa thông tin người dùng</h3>
+          <h3>Edit User Information</h3>
           <button onClick={onClose} className="close-button">&times;</button>
         </div>
         
         <form onSubmit={handleSubmit} className="modal-body">
-          <div className="form-group">
-            <label>Họ tên</label>
-            <input
-              type="text"
-              name="full_name"
-              value={formData.full_name}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
+          <div className="form-grid">
+            <div className="form-group">
+              <label htmlFor="username">Username*</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className={`form-input ${errors.username ? 'error' : ''}`}
+              />
+              {errors.username && (
+                <span className="error-message">{errors.username}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="full_name">Full Name*</label>
+              <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                className={`form-input ${errors.full_name ? 'error' : ''}`}
+              />
+              {errors.full_name && (
+                <span className="error-message">{errors.full_name}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={`form-input ${errors.phone ? 'error' : ''}`}
+                placeholder="+84 123 456 789"
+              />
+              {errors.phone && (
+                <span className="error-message">{errors.phone}</span>
+              )}
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="address">Address</label>
+              <textarea
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="form-input"
+                rows={3}
+                placeholder="Enter full address"
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Số điện thoại</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Địa chỉ</label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="form-input"
-              rows={3}
-            />
-          </div>
+          {errors.submit && (
+            <div className="error-banner">
+              {errors.submit}
+            </div>
+          )}
           
           <div className="form-actions">
             <button type="button" onClick={onClose} className="cancel-button">
-              Hủy
+              Cancel
             </button>
             <button type="submit" className="save-button">
-              Lưu thay đổi
+              Save Changes
             </button>
           </div>
         </form>

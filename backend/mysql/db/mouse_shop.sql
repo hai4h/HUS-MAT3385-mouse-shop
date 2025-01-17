@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 16, 2025 at 02:21 PM
+-- Generation Time: Jan 17, 2025 at 01:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -60,8 +60,7 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
-(62, 1, 1, 1, '2025-01-16 01:15:29'),
-(63, 1, 4, 1, '2025-01-16 01:15:43');
+(74, 1, 7, 1, '2025-01-17 11:44:58');
 
 -- --------------------------------------------------------
 
@@ -93,8 +92,9 @@ CREATE TABLE `coupons` (
 --
 
 INSERT INTO `coupons` (`coupon_id`, `code`, `name`, `description`, `discount_type`, `discount_value`, `min_order_value`, `max_discount_amount`, `start_date`, `end_date`, `total_usage_limit`, `user_usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-09 17:09:04'),
-(2, 'WELCOME2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-16 10:02:06', '2025-01-16 10:02:06');
+(1, 'TEST2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 60.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-09 17:09:04', '2025-01-16 20:57:18'),
+(2, 'WELCOME2025', 'Welcome Discount', 'New user discount', 'percentage', 10.00, 30.00, 50.00, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 1000, 1, 0, 1, '2025-01-16 10:02:06', '2025-01-16 10:02:06'),
+(3, 'COLAMMOICOAN', 'đời', '', 'percentage', 99.00, 0.00, 666.00, '2025-01-01 08:08:00', '2025-08-08 08:08:00', 1, 1, 0, 1, '2025-01-16 20:58:43', '2025-01-16 20:58:43');
 
 -- --------------------------------------------------------
 
@@ -114,7 +114,6 @@ CREATE TABLE `coupon_category_restrictions` (
 --
 
 INSERT INTO `coupon_category_restrictions` (`restriction_id`, `coupon_id`, `category`, `category_value`) VALUES
-(1, 1, 'brand', 'Logitech'),
 (2, 2, 'brand', 'Logitech');
 
 -- --------------------------------------------------------
@@ -184,9 +183,10 @@ CREATE TABLE `orders` (
 
 INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `shipping_address`, `note`, `order_date`, `updated_at`, `promotion_id`, `discount_amount`, `coupon_id`, `coupon_discount`) VALUES
 (1, 1, 129.99, 'pending', '123 Main St, City, Country, 12345', NULL, '2025-01-05 09:04:34', '2025-01-05 09:04:34', NULL, 0.00, NULL, 0.00),
-(2, 2, 107.99, 'delivered', 'Test User, 0123456789, So 7, Thien Quang', 'tét', '2025-01-12 11:56:07', '2025-01-12 11:56:07', 1, 30.00, 1, 12.00),
+(2, 2, 107.99, 'shipped', 'Test User, 0123456789, So 7, Thien Quang', 'tét', '2025-01-12 11:56:07', '2025-01-16 16:47:42', 1, 30.00, 1, 12.00),
 (3, 2, 207.98, 'delivered', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-14 16:52:47', '2025-01-14 16:52:47', 1, 32.00, NULL, 0.00),
-(4, 2, 79.99, 'pending', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-14 23:13:13', '2025-01-14 23:13:13', NULL, 0.00, NULL, 0.00);
+(4, 2, 79.99, 'pending', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-14 23:13:13', '2025-01-14 23:13:13', NULL, 0.00, NULL, 0.00),
+(5, 2, 90.99, 'pending', 'Test User, 01234567899, So 7, Thien Quang', '', '2025-01-16 18:16:50', '2025-01-16 18:16:50', 1, 39.00, NULL, 0.00);
 
 -- --------------------------------------------------------
 
@@ -212,7 +212,8 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `quant
 (2, 2, 2, 1, 149.99, 149.99),
 (3, 3, 3, 1, 159.99, 159.99),
 (4, 3, 4, 1, 79.99, 79.99),
-(5, 4, 4, 1, 79.99, 79.99);
+(5, 4, 4, 1, 79.99, 79.99),
+(6, 5, 1, 1, 129.99, 129.99);
 
 -- --------------------------------------------------------
 
@@ -245,7 +246,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `stock_quantity`, `hand_size`, `grip_style`, `is_wireless`, `brand`, `is_active`, `avg_user_rating`, `avg_expert_rating`, `total_reviews`, `created_at`, `updated_at`, `main_image`, `thumbnail_images`) VALUES
-(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 96, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43', NULL, NULL),
+(1, 'Logitech G Pro 2', 'Professional Gaming Mouse', 129.99, 95, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 07:54:43', '2024-12-18 07:54:43', NULL, NULL),
 (2, 'Logitech G Pro X Superlight', 'Ultra-lightweight wireless gaming mouse featuring HERO 25K sensor and LIGHTSPEED wireless technology', 149.99, 47, 'medium', 'claw', 1, 'Logitech', 1, NULL, NULL, 0, '2024-12-18 08:46:52', '2024-12-18 08:52:57', NULL, NULL),
 (3, 'Razer DeathAdder V3 Pro', 'Professional-grade wireless gaming mouse with Focus Pro 30K optical sensor', 159.99, 38, 'large', 'palm', 1, 'Razer', 1, NULL, NULL, 0, '2024-12-18 08:47:07', '2024-12-18 08:56:25', NULL, NULL),
 (4, 'Zowie EC2-C', 'Professional e-sports gaming mouse with ergonomic right-handed design', 79.99, 26, 'medium', 'palm', 0, 'Zowie', 1, NULL, NULL, 0, '2024-12-18 08:47:37', '2024-12-18 08:56:57', NULL, NULL),
@@ -272,8 +273,15 @@ CREATE TABLE `product_images` (
 --
 
 INSERT INTO `product_images` (`image_id`, `product_id`, `image_url`, `is_primary`, `created_at`) VALUES
-(1, 1, '/static/products/1/main.webp', 1, '2025-01-15 09:14:32'),
-(2, 1, '/static/products/1/thumb1.webp', 0, '2025-01-15 09:52:28');
+(1, 1, '/static/products/1/main.jpg', 1, '2025-01-15 09:14:32'),
+(2, 1, '/static/products/1/thumb1.jpg', 0, '2025-01-15 09:52:28'),
+(3, 2, '/static/products/2/main.jpg', 1, '2025-01-16 13:44:14'),
+(4, 3, '/static/products/3/main.jpg', 1, '2025-01-16 21:54:03'),
+(5, 4, '/static/products/4/main.jpg', 1, '2025-01-16 21:54:03'),
+(6, 5, '/static/products/5/main.jpg', 1, '2025-01-16 21:54:03'),
+(7, 6, '/static/products/6/main.jpg', 1, '2025-01-16 21:54:03'),
+(9, 8, '/static/products/8/main.jpg', 1, '2025-01-16 21:54:03'),
+(16, 7, '/static/products/7/main.webp', 1, '2025-01-17 11:43:27');
 
 -- --------------------------------------------------------
 
@@ -428,7 +436,38 @@ INSERT INTO `product_views` (`view_id`, `product_id`, `session_id`, `viewed_at`)
 (111, 1, '1736943232094-rl74d1tew', '2025-01-15 20:46:55'),
 (112, 2, '1736864067176-85mzn8s5g', '2025-01-16 01:14:39'),
 (113, 1, '1736943116478-5io6c8bcl', '2025-01-16 10:41:31'),
-(114, 1, '1736864067176-85mzn8s5g', '2025-01-16 10:49:31');
+(114, 1, '1736864067176-85mzn8s5g', '2025-01-16 10:49:31'),
+(115, 2, '1736864067176-85mzn8s5g', '2025-01-16 13:44:18'),
+(116, 2, '1736864067176-85mzn8s5g', '2025-01-16 13:44:27'),
+(117, 3, '1736864067176-85mzn8s5g', '2025-01-16 13:45:12'),
+(118, 4, '1736864067176-85mzn8s5g', '2025-01-16 13:45:44'),
+(119, 5, '1736864067176-85mzn8s5g', '2025-01-16 13:46:20'),
+(120, 5, '1736864067176-85mzn8s5g', '2025-01-16 13:48:23'),
+(121, 6, '1736864067176-85mzn8s5g', '2025-01-16 13:48:59'),
+(122, 7, '1736864067176-85mzn8s5g', '2025-01-16 13:51:30'),
+(123, 7, '1736864067176-85mzn8s5g', '2025-01-16 18:12:48'),
+(124, 2, '1736864067176-85mzn8s5g', '2025-01-16 18:22:50'),
+(125, 6, '1736864067176-85mzn8s5g', '2025-01-16 18:27:37'),
+(126, 2, '1736864236968-fwo31h00s', '2025-01-16 18:32:39'),
+(127, 2, '1737052376066-hmn0cyhg1', '2025-01-16 18:32:56'),
+(128, 1, '1736864067176-85mzn8s5g', '2025-01-16 18:44:28'),
+(129, 2, '1736864067176-85mzn8s5g', '2025-01-16 18:48:26'),
+(130, 2, '1736864067176-85mzn8s5g', '2025-01-16 18:49:11'),
+(131, 1, '1736864067176-85mzn8s5g', '2025-01-16 18:49:23'),
+(132, 2, '1736864067176-85mzn8s5g', '2025-01-16 18:49:30'),
+(133, 1, '1737052376066-hmn0cyhg1', '2025-01-16 21:59:21'),
+(134, 2, '1737052376066-hmn0cyhg1', '2025-01-16 21:59:28'),
+(135, 3, '1737052376066-hmn0cyhg1', '2025-01-16 21:59:31'),
+(136, 2, '1737052376066-hmn0cyhg1', '2025-01-16 22:04:13'),
+(137, 2, '1737052376066-hmn0cyhg1', '2025-01-16 22:04:15'),
+(138, 5, '1737052376066-hmn0cyhg1', '2025-01-16 22:05:33'),
+(139, 1, '1737052376066-hmn0cyhg1', '2025-01-16 22:06:54'),
+(140, 4, '1737052376066-hmn0cyhg1', '2025-01-16 22:06:55'),
+(141, 7, '1736864067176-85mzn8s5g', '2025-01-17 10:54:22'),
+(142, 2, '1736864067176-85mzn8s5g', '2025-01-17 11:54:34'),
+(143, 1, '1736864067176-85mzn8s5g', '2025-01-17 12:00:11'),
+(144, 1, '1736864067176-85mzn8s5g', '2025-01-17 12:00:16'),
+(145, 7, '1736864067176-85mzn8s5g', '2025-01-17 12:00:18');
 
 -- --------------------------------------------------------
 
@@ -458,7 +497,8 @@ CREATE TABLE `promotions` (
 --
 
 INSERT INTO `promotions` (`promotion_id`, `name`, `description`, `discount_type`, `discount_value`, `start_date`, `end_date`, `min_order_value`, `max_discount_amount`, `usage_limit`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 20.00, '2024-12-31 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 2, 1, '2025-01-09 17:05:55', '2025-01-09 17:05:55');
+(1, 'Summer Sale', 'Summer promotion 20% off', 'percentage', 30.00, '2024-12-31 00:00:00', '2025-06-30 23:59:59', 50.00, 100.00, 100, 3, 1, '2025-01-09 17:05:55', '2025-01-16 17:59:39'),
+(2, 'Chúc mừng tuổi mới', 'lăm mới xức khẻo', 'percentage', 1.00, '2025-06-06 17:00:00', '2025-08-05 17:00:00', 1.00, 1.00, 1, 0, 1, '2025-01-16 21:24:38', '2025-01-16 21:24:38');
 
 -- --------------------------------------------------------
 
@@ -558,8 +598,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `address`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'admintest', 'admin@example.com', '$2b$12$.4tn.sVnaxkxlxMhpXaURuVE0gBta5Z/aE7S7GIcDU0s19.cgZaLm', 'Hoang Dinh Hai Anh', NULL, NULL, 'admin', '2024-12-04 03:38:09', '2024-12-04 03:38:09'),
-(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User', '01234567899', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-13 12:12:00'),
-(3, 'testuser2', 'test2@example.eg', '$2b$12$WVwDUZBsSWiw2P8uZ52Rc.xRIcbOdPjPFrXacuLd5X.fB7F4uKH3q', 'Không Có Tên', '0366771508', 'lay đây mai đó', 'user', '2025-01-14 22:49:17', '2025-01-16 10:43:43');
+(2, 'testuser1', 'testuser12@example.com', '$2b$12$Ioq39SHgbrcF9ighx9ljXuWoQehiwRPSI5cJ3Nz2/bTukvEwYP/uq', 'Test User 1', '0123456789', 'So 7, Thien Quang', 'user', '2024-12-04 05:01:46', '2025-01-17 09:41:14'),
+(3, 'testuser21', 'test21@example.eg', '$2b$12$aJIngX3SHaIcdAbP4KTdveJbZvwk/N5EaxiMbbkd1P.bhmxzDwfUW', 'Không Có Tên', '0366771508', 'lay đây mai đó', 'user', '2025-01-14 22:49:17', '2025-01-17 10:21:45');
 
 -- --------------------------------------------------------
 
@@ -828,13 +868,13 @@ ALTER TABLE `carts`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `cart_item_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT for table `coupons`
 --
 ALTER TABLE `coupons`
-  MODIFY `coupon_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `coupon_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `coupon_category_restrictions`
@@ -858,13 +898,13 @@ ALTER TABLE `expert_reviews`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `order_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `order_detail_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -876,7 +916,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `product_promotions`
@@ -888,13 +928,13 @@ ALTER TABLE `product_promotions`
 -- AUTO_INCREMENT for table `product_views`
 --
 ALTER TABLE `product_views`
-  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
+  MODIFY `view_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT for table `promotions`
 --
 ALTER TABLE `promotions`
-  MODIFY `promotion_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `promotion_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `technical_specs`

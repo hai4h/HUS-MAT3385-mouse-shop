@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authEvents } from './authEvents';
 
 const axiosInstance = axios.create({
   baseURL: 'https://mou-x-test.azurewebsites.net',
@@ -27,16 +28,18 @@ axiosInstance.interceptors.response.use(
       const loginEndpoints = ['/token'];
       const currentUrl = error.config?.url;
       
+      // Không xử lý lỗi 401 cho các endpoint đăng nhập
       if (loginEndpoints.some(endpoint => currentUrl && currentUrl.includes(endpoint))) {
         return Promise.reject(error);
       }
 
+      // Kiểm tra token hết hạn
       const currentUser = JSON.parse(localStorage.getItem('adminUser'));
       const isTokenExpired = !currentUser || isTokenExpired(currentUser.access_token);
 
       if (isTokenExpired) {
-        localStorage.removeItem('adminUser');
-        window.location.href = '/login';
+        // Emit sự kiện token hết hạn
+        authEvents.emit('sessionExpired');
       }
 
       return Promise.reject(new Error('Session expired'));

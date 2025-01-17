@@ -5,7 +5,7 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    image: hai4h/test-backend:latest
+    image: hai4h/backend:latest
     volumes:
       - ./backend:/app
     environment:
@@ -20,9 +20,20 @@ services:
     build: 
       context: ./frontend-user
       dockerfile: Dockerfile
-    image: hai4h/test-frontend-user:latest
+    image: hai4h/frontend-user:latest
     volumes:
       - ./frontend-user:/app
       - /app/node_modules
     ports:
       - "3000:3000"
+  
+  frontend-admin:
+    build: 
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    image: hai4h/frontend-admin:latest
+    volumes:
+      - ./frontend-admin:/app
+      - /app/node_modules
+    ports:
+      - "3001:3001"

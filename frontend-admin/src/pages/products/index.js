@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../services/axiosConfig';
 import { Plus, Filter } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 
 import { productService } from '../../services/productService';
 import ProductList from '../../components/product/ProductList';
 import ProductForm from '../../components/product/ProductForm';
 import ProductFilters from '../../components/product/ProductFilters';
+import ProductImagesModal from '../../components/product/ProductImagesModal';
 
 import '../../styles/pages/products.scss';
 
@@ -18,6 +20,7 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -101,6 +104,11 @@ const Products = () => {
     }
   };
 
+  const handleImageManage = (product) => {
+    setSelectedProduct(product);
+    setShowImageModal(true);
+  };
+
   return (
     <div className="products-page">
       <div className="products-header">
@@ -142,6 +150,7 @@ const Products = () => {
           products={displayProducts}
           onEdit={handleEdit}
           onRefresh={fetchProducts}
+          onImageManage={handleImageManage}
         />
       )}
 
@@ -153,6 +162,18 @@ const Products = () => {
             setShowForm(false);
             setSelectedProduct(null);
           }}
+        />
+      )}
+
+      {showImageModal && selectedProduct && (
+        <ProductImagesModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowImageModal(false);
+            setSelectedProduct(null);
+            fetchProducts(); // Refresh list sau khi cập nhật ảnh
+          }}
+          onRefresh={fetchProducts}
         />
       )}
     </div>

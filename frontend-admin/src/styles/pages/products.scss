@@ -1,3 +1,5 @@
+@import '../components/products/image.scss';
+
 @keyframes modal-appear {
   from {
     opacity: 0;
@@ -318,6 +320,11 @@
 
         &.delete:hover {
           color: #dc2626;
+        }
+
+        &.image:hover {
+          color: #3b82f6;
+          background: #eff6ff;
         }
       }
     }
