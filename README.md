@@ -1,4 +1,4 @@
-# MouseX E-Commerce
+# MouseX E-Commerce - Main branch (chứa code chính thức để deploy, quá trình phát triển được thực hiện ở nhánh develop)
 (demo user)https://mou-x.azurewebsites.net/
 
 (demo admin)https://mou-x-admin.azurewebsites.net/
