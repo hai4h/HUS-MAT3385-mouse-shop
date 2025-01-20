@@ -3,6 +3,7 @@
   - Branch phát triển chính
   - Chứa code mới nhất đã được test sơ bộ
   - Là branch để integrate code từ các feature branches
+  - Design: https://www.figma.com/design/eTofuHOwW0teBn6bNZcGly/user-page?node-id=0-1&t=vsD6uPAYDJRCbkAp-1
 
 # Quy trình chạy:
 
