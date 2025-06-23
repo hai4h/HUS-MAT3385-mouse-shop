@@ -1,4 +1,4 @@
-# MouseX E-Commerce - Main branch (chứa code chính thức để deploy, quá trình phát triển được thực hiện ở nhánh develop)
+# MouseX E-Commerce
 
 ## 🚀 Kiến trúc Hệ thống
 
